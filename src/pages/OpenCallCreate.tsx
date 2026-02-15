@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CALL_TYPE_LABELS, LOCATION_MODE_LABELS, CallType, LocationMode, ProjectVisibility } from '@/lib/types';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 
 function OpenCallForm() {
@@ -50,7 +51,7 @@ function OpenCallForm() {
       created_by: user.id,
     }).select('id').single();
 
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else {
       toast.success('Açık çağrı oluşturuldu!');
       navigate(`/open-calls/${data.id}`);

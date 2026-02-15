@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMonday, timeAgo } from '@/lib/helpers';
 import { toast } from 'sonner';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { Bell, Check } from 'lucide-react';
 
 interface ChecklistItem { title: string; done: boolean; }
@@ -120,7 +121,7 @@ function DashboardContent() {
       blocker: blocker || null,
       help_request: helpRequest || null,
     }, { onConflict: 'project_id,week_start' });
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else toast.success('Check-in kaydedildi');
   };
 
@@ -142,7 +143,7 @@ function DashboardContent() {
 
   const updateAppStatus = async (appId: string, status: string) => {
     const { error } = await supabase.from('applications').update({ status: status as any }).eq('id', appId);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else { toast.success('Başvuru durumu güncellendi'); fetchAll(); }
   };
 
@@ -152,13 +153,13 @@ function DashboardContent() {
       current_stage: newStage as StageKey,
       stage_updated_at: new Date().toISOString(),
     }).eq('id', project.id);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else { toast.success('Evre güncellendi'); fetchAll(); }
   };
 
   const handleCallStatus = async (callId: string, status: string) => {
     const { error } = await supabase.from('open_calls').update({ status: status as any }).eq('id', callId);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else { toast.success('Çağrı durumu güncellendi'); fetchAll(); }
   };
 

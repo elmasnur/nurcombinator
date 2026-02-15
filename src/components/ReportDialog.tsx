@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Flag } from 'lucide-react';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -32,7 +33,7 @@ export default function ReportDialog({ targetType, targetId }: ReportDialogProps
       target_id: targetId,
       reason: reason.trim(),
     });
-    if (error) toast.error('Rapor gönderilemedi: ' + error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else { toast.success('Rapor gönderildi'); setOpen(false); setReason(''); }
     setLoading(false);
   };

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 
 function ProfileForm() {
@@ -44,7 +45,7 @@ function ProfileForm() {
       skills_tags: skills.split(',').map(s => s.trim()).filter(Boolean),
       availability_hours: hours,
     }).eq('id', user.id);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else toast.success('Profil güncellendi');
     setSaving(false);
   };
