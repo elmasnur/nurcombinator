@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import Guard from '@/components/Guard';
+import ErrorState from '@/components/ErrorState';
+import EmptyState from '@/components/EmptyState';
 import { Report } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,32 +11,36 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/helpers';
 import { toast } from 'sonner';
 
-export default function Moderation() {
-  const { user } = useAuth();
+function ModerationPanel() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
-    supabase.from('reports').select('*').order('created_at', { ascending: false })
+    supabase.from('reports').select('*').order('created_at', { ascending: false }).limit(100)
       .then(({ data, error }) => {
-        if (error) toast.error('Yetkisiz erişim');
+        if (error) { setForbidden(true); }
         setReports(data ?? []);
         setLoading(false);
       });
   }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from('reports').update({ status }).eq('id', id);
-    setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
-    toast.success('Durum güncellendi');
+    const { error } = await supabase.from('reports').update({ status }).eq('id', id);
+    if (error) toast.error(error.message);
+    else {
+      setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+      toast.success('Durum güncellendi');
+    }
   };
 
   if (loading) return <div className="container mx-auto px-4 py-8 text-muted-foreground">Yükleniyor...</div>;
+  if (forbidden) return <div className="container mx-auto px-4 py-8"><ErrorState title="Yetkisiz Erişim" description="Bu panele erişim yetkiniz yok." /></div>;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-6 font-display text-2xl font-bold">Moderasyon Paneli</h1>
-      {reports.length === 0 ? <p className="text-muted-foreground">Rapor yok.</p> : (
+      {reports.length === 0 ? <EmptyState message="Rapor yok." /> : (
         <div className="space-y-3">
           {reports.map(r => (
             <Card key={r.id} className="border-border bg-card">
@@ -61,5 +68,13 @@ export default function Moderation() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Moderation() {
+  return (
+    <Guard requireAuth>
+      <ModerationPanel />
+    </Guard>
   );
 }

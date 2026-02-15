@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import Guard from '@/components/Guard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,11 +12,12 @@ import { PROJECT_TYPE_LABELS, STAGE_LABELS, ProjectType, StageKey, ProjectVisibi
 import { slugify } from '@/lib/helpers';
 import { toast } from 'sonner';
 
-export default function ProjectCreate() {
+function ProjectCreateForm() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
+  const [description, setDescription] = useState('');
   const [type, setType] = useState<ProjectType>('other');
   const [visibility, setVisibility] = useState<ProjectVisibility>('public');
   const [stage, setStage] = useState<StageKey>('niyet_istikamet');
@@ -35,6 +37,7 @@ export default function ProjectCreate() {
       title: title.trim(),
       slug,
       summary: summary.trim() || null,
+      description: description.trim() || null,
       type,
       visibility,
       current_stage: stage,
@@ -42,7 +45,8 @@ export default function ProjectCreate() {
     }).select().single();
 
     if (error) {
-      toast.error('Proje oluşturulamadı: ' + error.message);
+      if (error.code === '23505') toast.error('Bu slug alınmış. Başka bir isim deneyin.');
+      else toast.error('Proje oluşturulamadı: ' + error.message);
       setLoading(false);
       return;
     }
@@ -55,14 +59,9 @@ export default function ProjectCreate() {
     });
 
     toast.success('Proje oluşturuldu!');
-    navigate(`/p/${slug}`);
+    navigate(`/p/${slug}/dashboard`);
     setLoading(false);
   };
-
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
 
   return (
     <div className="container mx-auto max-w-lg px-4 py-8">
@@ -75,6 +74,10 @@ export default function ProjectCreate() {
         <div>
           <Label>Özet</Label>
           <Textarea value={summary} onChange={e => setSummary(e.target.value)} maxLength={500} className="mt-1 bg-secondary border-border" rows={3} />
+        </div>
+        <div>
+          <Label>Açıklama (detaylı)</Label>
+          <Textarea value={description} onChange={e => setDescription(e.target.value)} maxLength={5000} className="mt-1 bg-secondary border-border" rows={5} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -120,5 +123,13 @@ export default function ProjectCreate() {
         </Button>
       </form>
     </div>
+  );
+}
+
+export default function ProjectCreate() {
+  return (
+    <Guard requireAuth>
+      <ProjectCreateForm />
+    </Guard>
   );
 }

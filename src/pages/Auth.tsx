@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,18 +13,21 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/explore';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) { toast.error('Geçerli bir email girin.'); return; }
     setLoading(true);
 
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error(error.message);
+        toast.error('Giriş yapılamadı. Tekrar deneyin.');
       } else {
         toast.success('Giriş başarılı');
-        navigate('/explore');
+        navigate(redirect);
       }
     } else {
       const { error } = await supabase.auth.signUp({
@@ -36,7 +39,7 @@ export default function Auth() {
         },
       });
       if (error) {
-        toast.error(error.message);
+        toast.error('Kayıt başarısız: ' + error.message);
       } else {
         toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.');
       }
@@ -54,41 +57,16 @@ export default function Auth() {
           {!isLogin && (
             <div>
               <Label htmlFor="displayName">Görünen Ad</Label>
-              <Input
-                id="displayName"
-                value={displayName}
-                onChange={e => setDisplayName(e.target.value)}
-                placeholder="Adınız"
-                className="mt-1 bg-secondary border-border"
-                maxLength={100}
-              />
+              <Input id="displayName" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Adınız" className="mt-1 bg-secondary border-border" maxLength={100} />
             </div>
           )}
           <div>
             <Label htmlFor="email">E-posta</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              placeholder="ornek@eposta.com"
-              className="mt-1 bg-secondary border-border"
-              maxLength={255}
-            />
+            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="ornek@eposta.com" className="mt-1 bg-secondary border-border" maxLength={255} />
           </div>
           <div>
             <Label htmlFor="password">Şifre</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder="••••••••"
-              className="mt-1 bg-secondary border-border"
-            />
+            <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="••••••••" className="mt-1 bg-secondary border-border" />
           </div>
           <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading}>
             {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}

@@ -1,112 +1,188 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Project, OpenCall, STAGE_LABELS, StageKey, PROJECT_TYPE_LABELS, ProjectType, CALL_TYPE_LABELS, CallType } from '@/lib/types';
+import { STAGE_LABELS, PROJECT_TYPE_LABELS, CALL_TYPE_LABELS, LOCATION_MODE_LABELS, StageKey, ProjectType, CallType, LocationMode, Project, OpenCall } from '@/lib/types';
+import { qProjectsExplore, qOpenCallsExplore, qProjectsByIds } from '@/lib/queries';
 import ProjectCard from '@/components/ProjectCard';
 import OpenCallCard from '@/components/OpenCallCard';
+import EmptyState from '@/components/EmptyState';
+import ErrorState from '@/components/ErrorState';
+import PaginationControls from '@/components/Pagination';
+import { CardGridSkeleton } from '@/components/LoadingSkeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+
+const PAGE_SIZE = 12;
 
 export default function Explore() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [calls, setCalls] = useState<(OpenCall & { projects: { title: string; slug: string | null } | null })[]>([]);
-  const [stageFilter, setStageFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [callTypeFilter, setCallTypeFilter] = useState<string>('all');
-  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('projects');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Project state
+  const [projects, setProjects] = useState<any[]>([]);
+  const [pTotal, setPTotal] = useState(0);
+  const [pPage, setPPage] = useState(1);
+  const [pSearch, setPSearch] = useState('');
+  const [stageFilter, setStageFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [pLoading, setPLoading] = useState(true);
+  const [pError, setPError] = useState(false);
 
-  const fetchData = async () => {
-    const [pRes, cRes] = await Promise.all([
-      supabase.from('projects').select('*').eq('visibility', 'public').order('created_at', { ascending: false }),
-      supabase.from('open_calls').select('*, projects(title, slug)').eq('status', 'open').eq('visibility', 'public').order('created_at', { ascending: false }),
-    ]);
-    setProjects(pRes.data ?? []);
-    setCalls(cRes.data ?? []);
-    setLoading(false);
-  };
+  // Call state
+  const [calls, setCalls] = useState<any[]>([]);
+  const [cTotal, setCTotal] = useState(0);
+  const [cPage, setCPage] = useState(1);
+  const [cSearch, setCSearch] = useState('');
+  const [callTypeFilter, setCallTypeFilter] = useState('all');
+  const [locFilter, setLocFilter] = useState('all');
+  const [cLoading, setCLoading] = useState(true);
+  const [cError, setCError] = useState(false);
 
-  const filteredProjects = projects.filter(p => {
-    if (stageFilter !== 'all' && p.current_stage !== stageFilter) return false;
-    if (typeFilter !== 'all' && p.type !== typeFilter) return false;
-    return true;
-  });
+  const fetchProjects = useCallback(async () => {
+    setPLoading(true);
+    setPError(false);
+    const { data, count, error } = await qProjectsExplore({
+      search: pSearch || undefined, stage: stageFilter, type: typeFilter, page: pPage, pageSize: PAGE_SIZE,
+    });
+    if (error) { setPError(true); setPLoading(false); return; }
+    setProjects(data ?? []);
+    setPTotal(count ?? 0);
+    setPLoading(false);
+  }, [pSearch, stageFilter, typeFilter, pPage]);
 
-  const filteredCalls = calls.filter(c => {
-    if (callTypeFilter !== 'all' && c.call_type !== callTypeFilter) return false;
-    return true;
-  });
+  const fetchCalls = useCallback(async () => {
+    setCLoading(true);
+    setCError(false);
+    const { data, count, error } = await qOpenCallsExplore({
+      search: cSearch || undefined, callType: callTypeFilter, locationMode: locFilter, page: cPage, pageSize: PAGE_SIZE,
+    });
+    if (error) { setCError(true); setCLoading(false); return; }
+    const callsData = data ?? [];
+
+    // Map project info
+    const projectIds = [...new Set(callsData.map(c => c.project_id))];
+    const { data: projectsData } = await qProjectsByIds(projectIds);
+    const pMap = new Map((projectsData ?? []).map(p => [p.id, p]));
+
+    setCalls(callsData.map(c => ({
+      ...c,
+      _projectTitle: pMap.get(c.project_id)?.title,
+      _projectSlug: pMap.get(c.project_id)?.slug,
+    })));
+    setCTotal(count ?? 0);
+    setCLoading(false);
+  }, [cSearch, callTypeFilter, locFilter, cPage]);
+
+  useEffect(() => { fetchProjects(); }, [fetchProjects]);
+  useEffect(() => { fetchCalls(); }, [fetchCalls]);
+
+  // Reset page on filter change
+  const handleStageFilter = (v: string) => { setStageFilter(v); setPPage(1); };
+  const handleTypeFilter = (v: string) => { setTypeFilter(v); setPPage(1); };
+  const handleCallTypeFilter = (v: string) => { setCallTypeFilter(v); setCPage(1); };
+  const handleLocFilter = (v: string) => { setLocFilter(v); setCPage(1); };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 font-display text-3xl font-bold">Keşfet</h1>
 
-      <Tabs defaultValue="projects">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-6 bg-secondary">
           <TabsTrigger value="projects">Projeler</TabsTrigger>
           <TabsTrigger value="calls">Açık Çağrılar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="projects">
-          <div className="mb-4 flex flex-wrap gap-3">
-            <Select value={stageFilter} onValueChange={setStageFilter}>
-              <SelectTrigger className="w-48 bg-secondary border-border">
-                <SelectValue placeholder="Evre" />
-              </SelectTrigger>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px] max-w-xs">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Proje ara..."
+                value={pSearch}
+                onChange={e => { setPSearch(e.target.value); setPPage(1); }}
+                className="bg-secondary border-border pl-9"
+              />
+            </div>
+            <Select value={stageFilter} onValueChange={handleStageFilter}>
+              <SelectTrigger className="w-48 bg-secondary border-border"><SelectValue placeholder="Evre" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Evreler</SelectItem>
-                {Object.entries(STAGE_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
+                {Object.entries(STAGE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-40 bg-secondary border-border">
-                <SelectValue placeholder="Tür" />
-              </SelectTrigger>
+            <Select value={typeFilter} onValueChange={handleTypeFilter}>
+              <SelectTrigger className="w-40 bg-secondary border-border"><SelectValue placeholder="Tür" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Türler</SelectItem>
-                {Object.entries(PROJECT_TYPE_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
+                {Object.entries(PROJECT_TYPE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-          {loading ? (
-            <p className="text-muted-foreground">Yükleniyor...</p>
-          ) : filteredProjects.length === 0 ? (
-            <p className="text-muted-foreground">Henüz proje yok.</p>
+
+          {pLoading ? (
+            <CardGridSkeleton />
+          ) : pError ? (
+            <ErrorState onRetry={fetchProjects} />
+          ) : projects.length === 0 ? (
+            <EmptyState message="Henüz proje yok." />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {projects.map(p => <ProjectCard key={p.id} project={p} />)}
+              </div>
+              <PaginationControls page={pPage} totalCount={pTotal} pageSize={PAGE_SIZE} onPageChange={setPPage} />
+            </>
           )}
         </TabsContent>
 
         <TabsContent value="calls">
-          <div className="mb-4">
-            <Select value={callTypeFilter} onValueChange={setCallTypeFilter}>
-              <SelectTrigger className="w-48 bg-secondary border-border">
-                <SelectValue placeholder="Çağrı Türü" />
-              </SelectTrigger>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px] max-w-xs">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Çağrı ara..."
+                value={cSearch}
+                onChange={e => { setCSearch(e.target.value); setCPage(1); }}
+                className="bg-secondary border-border pl-9"
+              />
+            </div>
+            <Select value={callTypeFilter} onValueChange={handleCallTypeFilter}>
+              <SelectTrigger className="w-48 bg-secondary border-border"><SelectValue placeholder="Çağrı Türü" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Türler</SelectItem>
-                {Object.entries(CALL_TYPE_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
+                {Object.entries(CALL_TYPE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={locFilter} onValueChange={handleLocFilter}>
+              <SelectTrigger className="w-40 bg-secondary border-border"><SelectValue placeholder="Konum" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tümü</SelectItem>
+                {Object.entries(LOCATION_MODE_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-          {loading ? (
-            <p className="text-muted-foreground">Yükleniyor...</p>
-          ) : filteredCalls.length === 0 ? (
-            <p className="text-muted-foreground">Henüz açık çağrı yok.</p>
+
+          {cLoading ? (
+            <CardGridSkeleton />
+          ) : cError ? (
+            <ErrorState onRetry={fetchCalls} />
+          ) : calls.length === 0 ? (
+            <EmptyState message="Henüz açık çağrı yok." />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredCalls.map(c => <OpenCallCard key={c.id} call={c} />)}
-            </div>
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {calls.map(c => (
+                  <OpenCallCard
+                    key={c.id}
+                    call={{
+                      ...c,
+                      projects: c._projectTitle ? { title: c._projectTitle, slug: c._projectSlug ?? null } : undefined,
+                    } as any}
+                  />
+                ))}
+              </div>
+              <PaginationControls page={cPage} totalCount={cTotal} pageSize={PAGE_SIZE} onPageChange={setCPage} />
+            </>
           )}
         </TabsContent>
       </Tabs>
