@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/lib/helpers';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
@@ -54,7 +55,7 @@ function ApplicationsList() {
 
   const withdraw = async (id: string) => {
     const { error } = await supabase.from('applications').update({ status: 'withdrawn' as any }).eq('id', id);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else {
       toast.success('Başvuru geri çekildi');
       setApps(prev => prev.map(a => a.id === id ? { ...a, status: 'withdrawn' } : a));

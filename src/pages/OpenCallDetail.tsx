@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/lib/helpers';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 import { MapPin, Clock, Users } from 'lucide-react';
 
@@ -42,19 +43,36 @@ export default function OpenCallDetail() {
     }
   }, [id, user]);
 
+  const isValidUrl = (url: string): boolean => {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
   const handleApply = async () => {
     if (!user || !id) return;
     setSubmitting(true);
-    const links = [link1, link2, link3].filter(Boolean);
+    const rawLinks = [link1, link2, link3].filter(Boolean);
+    
+    // Validate URL schemes to prevent javascript:, data:, etc.
+    if (rawLinks.length > 0 && !rawLinks.every(isValidUrl)) {
+      toast.error('Sadece http:// veya https:// ile başlayan linkler kabul edilir.');
+      setSubmitting(false);
+      return;
+    }
+    
     const { error } = await supabase.from('applications').insert({
       open_call_id: id,
       applicant_id: user.id,
       message: message.trim(),
-      links: links as any,
+      links: rawLinks as any,
     });
     if (error) {
       if (error.code === '23505') toast.error('Bu çağrıya zaten başvurdunuz.');
-      else toast.error('Başvuru gönderilemedi: ' + error.message);
+      else toast.error(getUserFriendlyError(error));
     } else {
       toast.success('Başvurunuz gönderildi!');
       navigate('/me/applications');

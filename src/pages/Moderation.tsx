@@ -9,25 +9,47 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/helpers';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 
 function ModerationPanel() {
+  const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
-    supabase.from('reports').select('*').order('created_at', { ascending: false }).limit(100)
-      .then(({ data, error }) => {
-        if (error) { setForbidden(true); }
-        setReports(data ?? []);
+    if (!user) return;
+    // Check role before attempting to fetch reports
+    const checkRoleAndFetch = async () => {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      
+      const hasAccess = (roles ?? []).some(r => r.role === 'admin' || r.role === 'moderator');
+      if (!hasAccess) {
+        setForbidden(true);
         setLoading(false);
-      });
-  }, []);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      if (error) { setForbidden(true); }
+      setReports(data ?? []);
+      setLoading(false);
+    };
+    checkRoleAndFetch();
+  }, [user]);
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('reports').update({ status }).eq('id', id);
-    if (error) toast.error(error.message);
+    if (error) toast.error(getUserFriendlyError(error));
     else {
       setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
       toast.success('Durum güncellendi');

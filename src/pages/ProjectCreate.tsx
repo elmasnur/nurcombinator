@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PROJECT_TYPE_LABELS, STAGE_LABELS, ProjectType, StageKey, ProjectVisibility } from '@/lib/types';
 import { slugify } from '@/lib/helpers';
+import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 
 function ProjectCreateForm() {
@@ -45,8 +46,7 @@ function ProjectCreateForm() {
     }).select().single();
 
     if (error) {
-      if (error.code === '23505') toast.error('Bu slug alınmış. Başka bir isim deneyin.');
-      else toast.error('Proje oluşturulamadı: ' + error.message);
+      toast.error(getUserFriendlyError(error));
       setLoading(false);
       return;
     }
