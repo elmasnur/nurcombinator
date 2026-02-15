@@ -49,5 +49,5 @@ export async function qProjectsByIds(ids: string[]) {
 
 export async function qProfilesPublicByIds(ids: string[]) {
   if (ids.length === 0) return { data: [] };
-  return supabase.from('profiles_public').select('id,display_name,bio,skills_tags,availability_hours,trust_level').in('id', ids);
+  return supabase.from('profiles_public').select('id,display_name,bio,skills_tags,availability_hours').in('id', ids);
 }

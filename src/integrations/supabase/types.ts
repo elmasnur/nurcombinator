@@ -463,7 +463,6 @@ export type Database = {
           display_name: string | null
           id: string | null
           skills_tags: string[] | null
-          trust_level: number | null
         }
         Insert: {
           availability_hours?: number | null
@@ -472,7 +471,6 @@ export type Database = {
           display_name?: string | null
           id?: string | null
           skills_tags?: string[] | null
-          trust_level?: number | null
         }
         Update: {
           availability_hours?: number | null
@@ -481,7 +479,6 @@ export type Database = {
           display_name?: string | null
           id?: string | null
           skills_tags?: string[] | null
-          trust_level?: number | null
         }
         Relationships: []
       }
