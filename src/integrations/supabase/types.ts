@@ -495,6 +495,18 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_mod: { Args: { p_user: string }; Returns: boolean }
+      is_project_member: {
+        Args: { p_project_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      is_project_owner: {
+        Args: { p_project_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      is_project_team: {
+        Args: { p_project_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_verified_user: { Args: { p_user: string }; Returns: boolean }
     }
     Enums: {
