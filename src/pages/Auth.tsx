@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedNavigate } from '@/hooks/useLocalizedNavigate';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,21 +14,22 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useLocalizedNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || '/explore';
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) { toast.error('Geçerli bir email girin.'); return; }
+    if (!email.trim()) { toast.error(t('auth.validEmail')); return; }
     setLoading(true);
 
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error('Giriş yapılamadı. Tekrar deneyin.');
+        toast.error(t('auth.loginFailed'));
       } else {
-        toast.success('Giriş başarılı');
+        toast.success(t('auth.loginSuccess'));
         navigate(redirect);
       }
     } else {
@@ -39,9 +42,9 @@ export default function Auth() {
         },
       });
       if (error) {
-        toast.error('Kayıt başarısız: ' + error.message);
+        toast.error(t('auth.registerFailed') + ': ' + error.message);
       } else {
-        toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.');
+        toast.success(t('auth.registerSuccess'));
       }
     }
     setLoading(false);
@@ -51,31 +54,31 @@ export default function Auth() {
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <h1 className="mb-6 text-center font-display text-2xl font-bold text-gradient-gold">
-          {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+          {isLogin ? t('auth.login') : t('auth.register')}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <Label htmlFor="displayName">Görünen Ad</Label>
-              <Input id="displayName" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Adınız" className="mt-1 bg-secondary border-border" maxLength={100} />
+              <Label htmlFor="displayName">{t('auth.displayName')}</Label>
+              <Input id="displayName" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder={t('auth.displayNamePlaceholder')} className="mt-1 bg-secondary border-border" maxLength={100} />
             </div>
           )}
           <div>
-            <Label htmlFor="email">E-posta</Label>
-            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="ornek@eposta.com" className="mt-1 bg-secondary border-border" maxLength={255} />
+            <Label htmlFor="email">{t('auth.email')}</Label>
+            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder={t('auth.emailPlaceholder')} className="mt-1 bg-secondary border-border" maxLength={255} />
           </div>
           <div>
-            <Label htmlFor="password">Şifre</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="••••••••" className="mt-1 bg-secondary border-border" />
           </div>
           <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={loading}>
-            {loading ? 'Yükleniyor...' : isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
+            {loading ? t('auth.loading') : isLogin ? t('auth.login') : t('auth.register')}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}{' '}
+          {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
           <button onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline">
-            {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
+            {isLogin ? t('auth.register') : t('auth.login')}
           </button>
         </p>
       </div>

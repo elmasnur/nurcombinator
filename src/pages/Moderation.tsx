@@ -11,38 +11,24 @@ import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/helpers';
 import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 function ModerationPanel() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    // Check role before attempting to fetch reports
     const checkRoleAndFetch = async () => {
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id);
-      
+      const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
       const hasAccess = (roles ?? []).some(r => r.role === 'admin' || r.role === 'moderator');
-      if (!hasAccess) {
-        setForbidden(true);
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('reports')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      
-      if (error) { setForbidden(true); }
-      setReports(data ?? []);
-      setLoading(false);
+      if (!hasAccess) { setForbidden(true); setLoading(false); return; }
+      const { data, error } = await supabase.from('reports').select('*').order('created_at', { ascending: false }).limit(100);
+      if (error) setForbidden(true);
+      setReports(data ?? []); setLoading(false);
     };
     checkRoleAndFetch();
   }, [user]);
@@ -50,19 +36,16 @@ function ModerationPanel() {
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('reports').update({ status }).eq('id', id);
     if (error) toast.error(getUserFriendlyError(error));
-    else {
-      setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
-      toast.success('Durum güncellendi');
-    }
+    else { setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r)); toast.success(t('moderation.statusUpdated')); }
   };
 
-  if (loading) return <div className="container mx-auto px-4 py-8 text-muted-foreground">Yükleniyor...</div>;
-  if (forbidden) return <div className="container mx-auto px-4 py-8"><ErrorState title="Yetkisiz Erişim" description="Bu panele erişim yetkiniz yok." /></div>;
+  if (loading) return <div className="container mx-auto px-4 py-8 text-muted-foreground">{t('common.loading')}</div>;
+  if (forbidden) return <div className="container mx-auto px-4 py-8"><ErrorState title={t('moderation.unauthorized')} description={t('moderation.unauthorizedDesc')} /></div>;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 font-display text-2xl font-bold">Moderasyon Paneli</h1>
-      {reports.length === 0 ? <EmptyState message="Rapor yok." /> : (
+      <h1 className="mb-6 font-display text-2xl font-bold">{t('moderation.title')}</h1>
+      {reports.length === 0 ? <EmptyState message={t('moderation.noReports')} /> : (
         <div className="space-y-3">
           {reports.map(r => (
             <Card key={r.id} className="border-border bg-card">
@@ -77,9 +60,9 @@ function ModerationPanel() {
                     <Badge variant={r.status === 'open' ? 'destructive' : 'secondary'} className="text-xs">{r.status}</Badge>
                     {r.status === 'open' && (
                       <>
-                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'reviewing')}>İncele</Button>
-                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'resolved')}>Çöz</Button>
-                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'rejected')}>Reddet</Button>
+                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'reviewing')}>{t('moderation.review')}</Button>
+                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'resolved')}>{t('moderation.resolve')}</Button>
+                        <Button size="sm" variant="ghost" className="h-6 text-xs" onClick={() => updateStatus(r.id, 'rejected')}>{t('moderation.reject')}</Button>
                       </>
                     )}
                   </div>
@@ -94,9 +77,5 @@ function ModerationPanel() {
 }
 
 export default function Moderation() {
-  return (
-    <Guard requireAuth>
-      <ModerationPanel />
-    </Guard>
-  );
+  return <Guard requireAuth><ModerationPanel /></Guard>;
 }

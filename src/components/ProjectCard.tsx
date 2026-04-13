@@ -1,11 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import StageBadge from '@/components/StageBadge';
-import { PROJECT_TYPE_LABELS, Project } from '@/lib/types';
+import { Project } from '@/lib/types';
+import { useTranslation } from 'react-i18next';
 
 export default function ProjectCard({ project }: { project: Project }) {
+  const { lang } = useParams<{ lang: string }>();
+  const { t } = useTranslation();
   return (
-    <Link to={`/p/${project.slug}`}>
+    <Link to={`/${lang ?? 'tr'}/p/${project.slug}`}>
       <Card className="group border-border bg-card transition hover:border-primary/30 hover:glow-gold">
         <CardContent className="p-5">
           <div className="mb-3 flex items-start justify-between">
@@ -19,12 +22,10 @@ export default function ProjectCard({ project }: { project: Project }) {
           )}
           <div className="flex flex-wrap gap-2">
             <span className="rounded bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-              {PROJECT_TYPE_LABELS[project.type]}
+              {t(`projectTypes.${project.type}`)}
             </span>
             {project.tags?.slice(0, 3).map(tag => (
-              <span key={tag} className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                {tag}
-              </span>
+              <span key={tag} className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">{tag}</span>
             ))}
           </div>
         </CardContent>

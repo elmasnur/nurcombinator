@@ -7,9 +7,11 @@ import { Notification } from '@/lib/types';
 import { timeAgo } from '@/lib/helpers';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 function NotificationsList() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,22 +33,22 @@ function NotificationsList() {
     setNotifs(prev => prev.map(n => ({ ...n, read_at: n.read_at || new Date().toISOString() })));
   };
 
-  if (loading) return <div className="container mx-auto max-w-2xl px-4 py-8 text-muted-foreground">Yükleniyor...</div>;
+  if (loading) return <div className="container mx-auto max-w-2xl px-4 py-8 text-muted-foreground">{t('common.loading')}</div>;
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">Bildirimler</h1>
+        <h1 className="font-display text-2xl font-bold">{t('notifications.title')}</h1>
         {notifs.some(n => !n.read_at) && (
-          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={markAllRead}>Tümünü okundu işaretle</Button>
+          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={markAllRead}>{t('notifications.markAllRead')}</Button>
         )}
       </div>
-      {notifs.length === 0 ? <EmptyState message="Bildirim yok." /> : (
+      {notifs.length === 0 ? <EmptyState message={t('notifications.noNotifications')} /> : (
         <ul className="space-y-2">
           {notifs.map(n => (
             <li key={n.id} className={`rounded p-3 text-sm ${n.read_at ? 'bg-muted/50' : 'bg-accent/30 border border-primary/20'}`}>
               <div className="flex justify-between">
-                <span>{n.type === 'new_application' ? 'Yeni başvuru geldi' : n.type}</span>
+                <span>{n.type === 'new_application' ? t('notifications.newApplication') : n.type}</span>
                 {!n.read_at && <button onClick={() => markRead(n.id)} className="text-primary"><Check className="h-4 w-4" /></button>}
               </div>
               <span className="text-xs text-muted-foreground">{timeAgo(n.created_at)}</span>
@@ -59,9 +61,5 @@ function NotificationsList() {
 }
 
 export default function Notifications() {
-  return (
-    <Guard requireAuth>
-      <NotificationsList />
-    </Guard>
-  );
+  return <Guard requireAuth><NotificationsList /></Guard>;
 }

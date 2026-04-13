@@ -1,13 +1,19 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocalizedNavigate, useLocalizedPath } from '@/hooks/useLocalizedNavigate';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Bell, LogOut, User, Menu, X } from 'lucide-react';
+import { Bell, LogOut, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useLocalizedNavigate();
+  const lp = useLocalizedPath();
+  const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
   const [unreadCount, setUnreadCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -21,25 +27,29 @@ export default function Navbar() {
       .then(({ count }) => setUnreadCount(count ?? 0));
   }, [user]);
 
+  // If we're outside /:lang routes (e.g. 404), fallback
+  const prefix = lang ? `/${lang}` : '/tr';
+
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <Link to="/" className="font-display text-xl font-bold text-gradient-gold">
-          Nur Combinator
+        <Link to={`${prefix}`} className="font-display text-xl font-bold text-gradient-gold">
+          {t('nav.brand')}
         </Link>
 
         {/* Desktop */}
         <div className="hidden items-center gap-4 md:flex">
-          <Link to="/explore" className="text-sm text-muted-foreground transition hover:text-foreground">
-            Keşfet
+          <Link to={`${prefix}/explore`} className="text-sm text-muted-foreground transition hover:text-foreground">
+            {t('nav.explore')}
           </Link>
+          <LanguageSwitcher />
           {user ? (
             <>
-              <Link to="/projects/new" className="text-sm text-muted-foreground transition hover:text-foreground">
-                Proje Oluştur
+              <Link to={`${prefix}/projects/new`} className="text-sm text-muted-foreground transition hover:text-foreground">
+                {t('nav.createProject')}
               </Link>
-              <Link to="/me" className="text-sm text-muted-foreground transition hover:text-foreground">
-                Profilim
+              <Link to={`${prefix}/me`} className="text-sm text-muted-foreground transition hover:text-foreground">
+                {t('nav.myProfile')}
               </Link>
               <button onClick={() => navigate('/me/notifications')} className="relative text-muted-foreground hover:text-foreground">
                 <Bell className="h-4 w-4" />
@@ -55,7 +65,7 @@ export default function Navbar() {
             </>
           ) : (
             <Button size="sm" onClick={() => navigate('/auth')} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Giriş Yap
+              {t('nav.login')}
             </Button>
           )}
         </div>
@@ -70,18 +80,19 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-border bg-background px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-3">
-            <Link to="/explore" onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">Keşfet</Link>
+            <Link to={`${prefix}/explore`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.explore')}</Link>
+            <div onClick={() => setMenuOpen(false)}><LanguageSwitcher /></div>
             {user ? (
               <>
-                <Link to="/projects/new" onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">Proje Oluştur</Link>
-                <Link to="/me" onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">Profilim</Link>
-                <Link to="/me/notifications" onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">
-                  Bildirimler {unreadCount > 0 && `(${unreadCount})`}
+                <Link to={`${prefix}/projects/new`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.createProject')}</Link>
+                <Link to={`${prefix}/me`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.myProfile')}</Link>
+                <Link to={`${prefix}/me/notifications`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">
+                  {t('nav.notifications')} {unreadCount > 0 && `(${unreadCount})`}
                 </Link>
-                <button onClick={() => { signOut(); setMenuOpen(false); }} className="text-sm text-left text-muted-foreground">Çıkış</button>
+                <button onClick={() => { signOut(); setMenuOpen(false); }} className="text-sm text-left text-muted-foreground">{t('nav.logout')}</button>
               </>
             ) : (
-              <Button size="sm" onClick={() => { navigate('/auth'); setMenuOpen(false); }}>Giriş Yap</Button>
+              <Button size="sm" onClick={() => { navigate('/auth'); setMenuOpen(false); }}>{t('nav.login')}</Button>
             )}
           </div>
         </div>

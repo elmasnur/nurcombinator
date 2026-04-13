@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Flag } from 'lucide-react';
 import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import type { Database } from '@/integrations/supabase/types';
 
 type ReportTargetType = Database['public']['Enums']['report_target_type'];
@@ -21,6 +22,7 @@ export default function ReportDialog({ targetType, targetId }: ReportDialogProps
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   if (!user) return null;
 
@@ -34,7 +36,7 @@ export default function ReportDialog({ targetType, targetId }: ReportDialogProps
       reason: reason.trim(),
     });
     if (error) toast.error(getUserFriendlyError(error));
-    else { toast.success('Rapor gönderildi'); setOpen(false); setReason(''); }
+    else { toast.success(t('report.success')); setOpen(false); setReason(''); }
     setLoading(false);
   };
 
@@ -42,21 +44,14 @@ export default function ReportDialog({ targetType, targetId }: ReportDialogProps
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-muted-foreground">
-          <Flag className="mr-1 h-3 w-3" /> Raporla
+          <Flag className="mr-1 h-3 w-3" /> {t('report.button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-card border-border">
-        <DialogHeader><DialogTitle>Raporla</DialogTitle></DialogHeader>
-        <Textarea
-          value={reason}
-          onChange={e => setReason(e.target.value)}
-          placeholder="Raporlama nedeniniz..."
-          maxLength={500}
-          className="bg-secondary border-border"
-          rows={3}
-        />
+        <DialogHeader><DialogTitle>{t('report.title')}</DialogTitle></DialogHeader>
+        <Textarea value={reason} onChange={e => setReason(e.target.value)} placeholder={t('report.placeholder')} maxLength={500} className="bg-secondary border-border" rows={3} />
         <Button onClick={handleSubmit} disabled={!reason.trim() || loading} className="bg-primary text-primary-foreground">
-          {loading ? 'Gönderiliyor...' : 'Gönder'}
+          {loading ? t('report.submitting') : t('report.submit')}
         </Button>
       </DialogContent>
     </Dialog>

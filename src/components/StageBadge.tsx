@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
-import { STAGE_LABELS, STAGE_ORDER, StageKey } from '@/lib/types';
+import { STAGE_ORDER, StageKey } from '@/lib/types';
+import { useTranslation } from 'react-i18next';
 
 interface StageBadgeProps {
   stage: StageKey;
@@ -8,10 +9,11 @@ interface StageBadgeProps {
 
 export default function StageBadge({ stage, size = 'sm' }: StageBadgeProps) {
   const idx = STAGE_ORDER.indexOf(stage);
+  const { t } = useTranslation();
   return (
     <Badge variant="outline" className={`border-gold-subtle text-accent-foreground ${size === 'md' ? 'px-3 py-1' : ''}`}>
       <span className="mr-1.5 text-primary">{idx + 1}.</span>
-      {STAGE_LABELS[stage]}
+      {t(`stages.${stage}`)}
     </Badge>
   );
 }
