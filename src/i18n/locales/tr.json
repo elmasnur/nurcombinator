@@ -62,7 +62,8 @@
     "stage": "Evre",
     "type": "Tür",
     "callType": "Çağrı Türü",
-    "location": "Konum"
+    "location": "Konum",
+    "addTag": "Etiket ekle (Enter)"
   },
   "projectCreate": {
     "title": "Yeni Proje Oluştur",
