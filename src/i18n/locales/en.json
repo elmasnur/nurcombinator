@@ -62,7 +62,8 @@
     "stage": "Stage",
     "type": "Type",
     "callType": "Call Type",
-    "location": "Location"
+    "location": "Location",
+    "addTag": "Add tag (Enter)"
   },
   "projectCreate": {
     "title": "Create New Project",
