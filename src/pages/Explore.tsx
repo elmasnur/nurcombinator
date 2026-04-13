@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { qProjectsExplore, qOpenCallsExplore, qProjectsByIds } from '@/lib/queries';
 import ProjectCard from '@/components/ProjectCard';
@@ -10,14 +10,24 @@ import { CardGridSkeleton } from '@/components/LoadingSkeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { STAGE_ORDER, type StageKey, type ProjectType, type CallType, type LocationMode } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
+import { Search, X } from 'lucide-react';
+import { STAGE_ORDER, type ProjectType, type CallType, type LocationMode } from '@/lib/types';
 
 const PAGE_SIZE = 12;
 
 const PROJECT_TYPES: ProjectType[] = ['content','app','community','open_source','education','media','other'];
 const CALL_TYPES: CallType[] = ['core','volunteer','short_task','advisor'];
 const LOCATION_MODES: LocationMode[] = ['remote','onsite','hybrid'];
+
+function useDebounce(value: string, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
 
 export default function Explore() {
   const { t } = useTranslation();
@@ -28,6 +38,8 @@ export default function Explore() {
   const [pSearch, setPSearch] = useState('');
   const [stageFilter, setStageFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [pTags, setPTags] = useState<string[]>([]);
+  const [pTagInput, setPTagInput] = useState('');
   const [pLoading, setPLoading] = useState(true);
   const [pError, setPError] = useState(false);
 
@@ -37,19 +49,24 @@ export default function Explore() {
   const [cSearch, setCSearch] = useState('');
   const [callTypeFilter, setCallTypeFilter] = useState('all');
   const [locFilter, setLocFilter] = useState('all');
+  const [cTags, setCTags] = useState<string[]>([]);
+  const [cTagInput, setCTagInput] = useState('');
   const [cLoading, setCLoading] = useState(true);
   const [cError, setCError] = useState(false);
 
+  const debouncedPSearch = useDebounce(pSearch);
+  const debouncedCSearch = useDebounce(cSearch);
+
   const fetchProjects = useCallback(async () => {
     setPLoading(true); setPError(false);
-    const { data, count, error } = await qProjectsExplore({ search: pSearch || undefined, stage: stageFilter, type: typeFilter, page: pPage, pageSize: PAGE_SIZE });
+    const { data, count, error } = await qProjectsExplore({ search: debouncedPSearch || undefined, stage: stageFilter, type: typeFilter, tags: pTags.length > 0 ? pTags : undefined, page: pPage, pageSize: PAGE_SIZE });
     if (error) { setPError(true); setPLoading(false); return; }
     setProjects(data ?? []); setPTotal(count ?? 0); setPLoading(false);
-  }, [pSearch, stageFilter, typeFilter, pPage]);
+  }, [debouncedPSearch, stageFilter, typeFilter, pTags, pPage]);
 
   const fetchCalls = useCallback(async () => {
     setCLoading(true); setCError(false);
-    const { data, count, error } = await qOpenCallsExplore({ search: cSearch || undefined, callType: callTypeFilter, locationMode: locFilter, page: cPage, pageSize: PAGE_SIZE });
+    const { data, count, error } = await qOpenCallsExplore({ search: debouncedCSearch || undefined, callType: callTypeFilter, locationMode: locFilter, tags: cTags.length > 0 ? cTags : undefined, page: cPage, pageSize: PAGE_SIZE });
     if (error) { setCError(true); setCLoading(false); return; }
     const callsData = data ?? [];
     const projectIds = [...new Set(callsData.map(c => c.project_id))];
@@ -57,7 +74,7 @@ export default function Explore() {
     const pMap = new Map((projectsData ?? []).map(p => [p.id, p]));
     setCalls(callsData.map(c => ({ ...c, _projectTitle: pMap.get(c.project_id)?.title, _projectSlug: pMap.get(c.project_id)?.slug })));
     setCTotal(count ?? 0); setCLoading(false);
-  }, [cSearch, callTypeFilter, locFilter, cPage]);
+  }, [debouncedCSearch, callTypeFilter, locFilter, cTags, cPage]);
 
   useEffect(() => { fetchProjects(); }, [fetchProjects]);
   useEffect(() => { fetchCalls(); }, [fetchCalls]);
@@ -66,6 +83,20 @@ export default function Explore() {
   const handleTypeFilter = (v: string) => { setTypeFilter(v); setPPage(1); };
   const handleCallTypeFilter = (v: string) => { setCallTypeFilter(v); setCPage(1); };
   const handleLocFilter = (v: string) => { setLocFilter(v); setCPage(1); };
+
+  const addPTag = (val: string) => {
+    const tag = val.trim().toLowerCase();
+    if (tag && !pTags.includes(tag)) { setPTags([...pTags, tag]); setPPage(1); }
+    setPTagInput('');
+  };
+  const removePTag = (tag: string) => { setPTags(pTags.filter(t => t !== tag)); setPPage(1); };
+
+  const addCTag = (val: string) => {
+    const tag = val.trim().toLowerCase();
+    if (tag && !cTags.includes(tag)) { setCTags([...cTags, tag]); setCPage(1); }
+    setCTagInput('');
+  };
+  const removeCTag = (tag: string) => { setCTags(cTags.filter(t => t !== tag)); setCPage(1); };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -97,7 +128,25 @@ export default function Explore() {
                 {PROJECT_TYPES.map(k => <SelectItem key={k} value={k}>{t(`projectTypes.${k}`)}</SelectItem>)}
               </SelectContent>
             </Select>
+            <div className="relative min-w-[160px] max-w-xs">
+              <Input
+                placeholder={t('explore.addTag')}
+                value={pTagInput}
+                onChange={e => setPTagInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addPTag(pTagInput); } }}
+                className="bg-secondary border-border"
+              />
+            </div>
           </div>
+          {pTags.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {pTags.map(tag => (
+                <Badge key={tag} variant="secondary" className="gap-1 cursor-pointer" onClick={() => removePTag(tag)}>
+                  {tag} <X className="h-3 w-3" />
+                </Badge>
+              ))}
+            </div>
+          )}
           {pLoading ? <CardGridSkeleton /> : pError ? <ErrorState onRetry={fetchProjects} /> : projects.length === 0 ? <EmptyState message={t('explore.noProjects')} /> : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{projects.map(p => <ProjectCard key={p.id} project={p} />)}</div>
@@ -126,7 +175,25 @@ export default function Explore() {
                 {LOCATION_MODES.map(k => <SelectItem key={k} value={k}>{t(`locationModes.${k}`)}</SelectItem>)}
               </SelectContent>
             </Select>
+            <div className="relative min-w-[160px] max-w-xs">
+              <Input
+                placeholder={t('explore.addTag')}
+                value={cTagInput}
+                onChange={e => setCTagInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCTag(cTagInput); } }}
+                className="bg-secondary border-border"
+              />
+            </div>
           </div>
+          {cTags.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {cTags.map(tag => (
+                <Badge key={tag} variant="secondary" className="gap-1 cursor-pointer" onClick={() => removeCTag(tag)}>
+                  {tag} <X className="h-3 w-3" />
+                </Badge>
+              ))}
+            </div>
+          )}
           {cLoading ? <CardGridSkeleton /> : cError ? <ErrorState onRetry={fetchCalls} /> : calls.length === 0 ? <EmptyState message={t('explore.noCalls')} /> : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
