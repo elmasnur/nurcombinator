@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import Guard from '@/components/Guard';
-import EmptyState from '@/components/EmptyState';
 import { Profile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { getUserFriendlyError } from '@/lib/error-utils';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 function ProfileForm() {
   const { user } = useAuth();
@@ -23,11 +24,22 @@ function ProfileForm() {
   const [hours, setHours] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle().then(({ data }) => {
-      if (data) { setProfile(data); setDisplayName(data.display_name); setBio(data.bio || ''); setSkills((data.skills_tags || []).join(', ')); setHours(data.availability_hours || 0); }
+    Promise.all([
+      supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+      supabase.from('email_preferences').select('*').eq('user_id', user.id).maybeSingle(),
+    ]).then(([{ data: profileData }, { data: prefData }]) => {
+      if (profileData) {
+        setProfile(profileData);
+        setDisplayName(profileData.display_name);
+        setBio(profileData.bio || '');
+        setSkills((profileData.skills_tags || []).join(', '));
+        setHours(profileData.availability_hours || 0);
+      }
+      if (prefData) setWeeklyDigest(prefData.weekly_digest);
       setLoading(false);
     });
   }, [user]);
@@ -40,6 +52,14 @@ function ProfileForm() {
       skills_tags: skills.split(',').map(s => s.trim()).filter(Boolean),
       availability_hours: hours,
     }).eq('id', user.id);
+
+    // Upsert email preferences
+    await supabase.from('email_preferences').upsert({
+      user_id: user.id,
+      weekly_digest: weeklyDigest,
+      language: i18n.language,
+    }, { onConflict: 'user_id' });
+
     if (error) toast.error(getUserFriendlyError(error));
     else toast.success(t('myProfile.saved'));
     setSaving(false);
@@ -61,6 +81,13 @@ function ProfileForm() {
         <div><Label>{t('myProfile.hours')}</Label><Input type="number" value={hours} onChange={e => setHours(Number(e.target.value))} min={0} max={168} className="mt-1 bg-secondary border-border" /></div>
         <div className="rounded bg-muted p-3 text-sm text-muted-foreground">
           {t('myProfile.trustLevel')}: <span className="text-foreground font-medium">{profile?.trust_level ?? 0}</span> <span className="text-xs">{t('myProfile.trustNote')}</span>
+        </div>
+        <div className="flex items-center justify-between rounded bg-muted p-3">
+          <div>
+            <p className="text-sm font-medium">{t('myProfile.weeklyDigest')}</p>
+            <p className="text-xs text-muted-foreground">{t('myProfile.weeklyDigestDesc')}</p>
+          </div>
+          <Switch checked={weeklyDigest} onCheckedChange={setWeeklyDigest} />
         </div>
         <Button onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">
           {saving ? t('myProfile.saving') : t('myProfile.save')}
