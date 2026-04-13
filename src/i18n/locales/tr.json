@@ -175,7 +175,9 @@
     "trustNote": "(sadece yönetici değiştirebilir)",
     "save": "Kaydet",
     "saving": "Kaydediliyor...",
-    "saved": "Profil güncellendi"
+    "saved": "Profil güncellendi",
+    "weeklyDigest": "Haftalık Özet E-postası",
+    "weeklyDigestDesc": "Her hafta yeni projeler ve açık çağrılar hakkında e-posta alın."
   },
   "myApplications": {
     "title": "Başvurularım",
