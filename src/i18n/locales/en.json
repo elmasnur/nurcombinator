@@ -175,7 +175,9 @@
     "trustNote": "(admin only)",
     "save": "Save",
     "saving": "Saving...",
-    "saved": "Profile updated"
+    "saved": "Profile updated",
+    "weeklyDigest": "Weekly Digest Email",
+    "weeklyDigestDesc": "Receive weekly emails about new projects and open calls."
   },
   "myApplications": {
     "title": "My Applications",
