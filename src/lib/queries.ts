@@ -4,28 +4,28 @@ import type { StageKey, ProjectType, CallType, LocationMode } from '@/lib/types'
 const PAGE_SIZE = 12;
 
 export async function qProjectsExplore({
-  search, stage, type, tag, page = 1, pageSize = PAGE_SIZE
+  search, stage, type, tags, page = 1, pageSize = PAGE_SIZE
 }: {
-  search?: string; stage?: string; type?: string; tag?: string; page?: number; pageSize?: number;
+  search?: string; stage?: string; type?: string; tags?: string[]; page?: number; pageSize?: number;
 }) {
   let qb = supabase
     .from('projects')
     .select('id,slug,title,summary,type,current_stage,tags,cover_image_url,created_at', { count: 'exact' })
     .order('created_at', { ascending: false });
 
-  if (search) qb = qb.ilike('title', `%${search}%`);
+  if (search) qb = qb.textSearch('fts', search.split(/\s+/).join(' & '), { type: 'plain' });
   if (stage && stage !== 'all') qb = qb.eq('current_stage', stage as StageKey);
   if (type && type !== 'all') qb = qb.eq('type', type as ProjectType);
-  if (tag) qb = qb.contains('tags', [tag]);
+  if (tags && tags.length > 0) qb = qb.contains('tags', tags);
   qb = qb.range((page - 1) * pageSize, page * pageSize - 1);
 
   return qb;
 }
 
 export async function qOpenCallsExplore({
-  search, callType, locationMode, tag, page = 1, pageSize = PAGE_SIZE
+  search, callType, locationMode, tags, page = 1, pageSize = PAGE_SIZE
 }: {
-  search?: string; callType?: string; locationMode?: string; tag?: string; page?: number; pageSize?: number;
+  search?: string; callType?: string; locationMode?: string; tags?: string[]; page?: number; pageSize?: number;
 }) {
   let qb = supabase
     .from('open_calls')
@@ -33,10 +33,10 @@ export async function qOpenCallsExplore({
     .in('status', ['open'])
     .order('created_at', { ascending: false });
 
-  if (search) qb = qb.ilike('title', `%${search}%`);
+  if (search) qb = qb.textSearch('fts', search.split(/\s+/).join(' & '), { type: 'plain' });
   if (callType && callType !== 'all') qb = qb.eq('call_type', callType as CallType);
   if (locationMode && locationMode !== 'all') qb = qb.eq('location_mode', locationMode as LocationMode);
-  if (tag) qb = qb.contains('tags', [tag]);
+  if (tags && tags.length > 0) qb = qb.contains('tags', tags);
   qb = qb.range((page - 1) * pageSize, page * pageSize - 1);
 
   return qb;
