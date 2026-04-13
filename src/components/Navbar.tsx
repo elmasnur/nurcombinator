@@ -17,6 +17,9 @@ export default function Navbar() {
   const { lang } = useParams<{ lang: string }>();
   const [unreadCount, setUnreadCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     if (!user) return;
