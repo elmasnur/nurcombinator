@@ -1,10 +1,14 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
+import { useLocalizedPath } from '@/hooks/useLocalizedNavigate';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Shield, Users, Compass, Layers, CheckCircle, MessageSquare } from 'lucide-react';
+import { ArrowRight, Shield, Users, Compass } from 'lucide-react';
 
 export default function Landing() {
   const { user } = useAuth();
+  const { t } = useTranslation();
+  const lp = useLocalizedPath();
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
@@ -12,19 +16,19 @@ export default function Landing() {
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center">
         <div className="animate-fade-in max-w-2xl">
           <h1 className="mb-6 font-display text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl">
-            <span className="text-gradient-gold">Nur Combinator</span>
+            <span className="text-gradient-gold">{t('landing.title')}</span>
           </h1>
           <p className="mx-auto mb-8 max-w-xl text-lg text-muted-foreground">
-            Risale-i Nur ve İslamiyet odaklı projeleri yayına çıkma, kullanıcıya dokunma ve sürdürülebilirlik evrelerinde yönlendiren platform.
+            {t('landing.subtitle')}
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 glow-gold">
-              <Link to="/explore">
-                Projeleri Keşfet <ArrowRight className="ml-2 h-4 w-4" />
+              <Link to={lp('/explore')}>
+                {t('landing.exploreBtn')} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-secondary">
-              <Link to={user ? '/projects/new' : '/auth?redirect=/projects/new'}>Proje Oluştur</Link>
+              <Link to={user ? lp('/projects/new') : lp('/auth?redirect=/projects/new')}>{t('landing.createBtn')}</Link>
             </Button>
           </div>
         </div>
@@ -33,23 +37,19 @@ export default function Landing() {
       {/* How It Works */}
       <section className="border-t border-border px-4 py-16">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="mb-10 text-center font-display text-2xl font-bold">Nasıl Çalışır?</h2>
+          <h2 className="mb-10 text-center font-display text-2xl font-bold">{t('landing.howItWorks')}</h2>
           <div className="grid gap-8 md:grid-cols-3">
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground font-bold">1</div>
-              <h3 className="mb-1 font-display text-base font-semibold">Proje Oluştur</h3>
-              <p className="text-sm text-muted-foreground">Projenizi tanımlayın, evresini seçin ve yola çıkın.</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground font-bold">2</div>
-              <h3 className="mb-1 font-display text-base font-semibold">Ekip Kurun</h3>
-              <p className="text-sm text-muted-foreground">Açık Çağrı ile ekip arkadaşı ve paydaş bulun.</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground font-bold">3</div>
-              <h3 className="mb-1 font-display text-base font-semibold">Evrelerle İlerleyin</h3>
-              <p className="text-sm text-muted-foreground">7 evre rehberliğinde projenizi sürdürülebilir hale getirin.</p>
-            </div>
+            {[
+              { num: 1, title: t('landing.step1Title'), desc: t('landing.step1Desc') },
+              { num: 2, title: t('landing.step2Title'), desc: t('landing.step2Desc') },
+              { num: 3, title: t('landing.step3Title'), desc: t('landing.step3Desc') },
+            ].map(s => (
+              <div key={s.num} className="flex flex-col items-center text-center">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground font-bold">{s.num}</div>
+                <h3 className="mb-1 font-display text-base font-semibold">{s.title}</h3>
+                <p className="text-sm text-muted-foreground">{s.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -57,33 +57,23 @@ export default function Landing() {
       {/* Principles */}
       <section className="border-t border-border bg-card/50 px-4 py-16">
         <div className="container mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-              <Shield className="h-5 w-5 text-accent-foreground" />
+          {[
+            { icon: <Shield className="h-5 w-5 text-accent-foreground" />, title: t('landing.securityTitle'), desc: t('landing.securityDesc') },
+            { icon: <Compass className="h-5 w-5 text-accent-foreground" />, title: t('landing.stageTitle'), desc: t('landing.stageDesc') },
+            { icon: <Users className="h-5 w-5 text-accent-foreground" />, title: t('landing.networkTitle'), desc: t('landing.networkDesc') },
+          ].map((p, i) => (
+            <div key={i} className="flex flex-col items-center text-center">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent">{p.icon}</div>
+              <h3 className="mb-1 font-display text-base font-semibold">{p.title}</h3>
+              <p className="text-sm text-muted-foreground">{p.desc}</p>
             </div>
-            <h3 className="mb-1 font-display text-base font-semibold">Güvenlik & Gizlilik</h3>
-            <p className="text-sm text-muted-foreground">Kişisel veri sızdırma yok, spam ve tacize karşı sıfır tolerans.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-              <Compass className="h-5 w-5 text-accent-foreground" />
-            </div>
-            <h3 className="mb-1 font-display text-base font-semibold">Evre Bazlı Yönlendirme</h3>
-            <p className="text-sm text-muted-foreground">7 evre ile projenizi niyetten kurumsallaşmaya taşıyın.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-              <Users className="h-5 w-5 text-accent-foreground" />
-            </div>
-            <h3 className="mb-1 font-display text-base font-semibold">Açık Çağrı & Networking</h3>
-            <p className="text-sm text-muted-foreground">Her evrede ekip arkadaşı ve paydaş arayışı yapın.</p>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
-        Nur Combinator — Şeffaflık, saygı ve hizmet.
+        {t('landing.footer')}
       </footer>
     </div>
   );
