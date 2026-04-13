@@ -6,7 +6,9 @@
     "notifications": "Bildirimler",
     "logout": "Çıkış",
     "login": "Giriş Yap",
-    "brand": "Nur Combinator"
+    "brand": "Nur Combinator",
+    "lightMode": "Aydınlık Mod",
+    "darkMode": "Karanlık Mod"
   },
   "landing": {
     "title": "Nur Combinator",

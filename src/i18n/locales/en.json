@@ -6,7 +6,9 @@
     "notifications": "Notifications",
     "logout": "Logout",
     "login": "Sign In",
-    "brand": "Nur Combinator"
+    "brand": "Nur Combinator",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
   },
   "landing": {
     "title": "Nur Combinator",
