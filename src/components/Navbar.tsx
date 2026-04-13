@@ -3,7 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLocalizedNavigate, useLocalizedPath } from '@/hooks/useLocalizedNavigate';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Bell, LogOut, Menu, X } from 'lucide-react';
+import { Bell, LogOut, Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -16,6 +17,9 @@ export default function Navbar() {
   const { lang } = useParams<{ lang: string }>();
   const [unreadCount, setUnreadCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const toggleTheme = () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
 
   useEffect(() => {
     if (!user) return;
@@ -43,6 +47,9 @@ export default function Navbar() {
             {t('nav.explore')}
           </Link>
           <LanguageSwitcher />
+          <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition" aria-label="Toggle theme">
+            {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           {user ? (
             <>
               <Link to={`${prefix}/projects/new`} className="text-sm text-muted-foreground transition hover:text-foreground">
@@ -82,6 +89,10 @@ export default function Navbar() {
           <div className="flex flex-col gap-3">
             <Link to={`${prefix}/explore`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.explore')}</Link>
             <div onClick={() => setMenuOpen(false)}><LanguageSwitcher /></div>
+            <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-muted-foreground">
+              {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {resolvedTheme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+            </button>
             {user ? (
               <>
                 <Link to={`${prefix}/projects/new`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.createProject')}</Link>

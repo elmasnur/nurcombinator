@@ -164,6 +164,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          fts: unknown
           id: string
           location_mode: Database["public"]["Enums"]["location_mode"]
           project_id: string
@@ -180,6 +181,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          fts?: unknown
           id?: string
           location_mode?: Database["public"]["Enums"]["location_mode"]
           project_id: string
@@ -196,6 +198,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          fts?: unknown
           id?: string
           location_mode?: Database["public"]["Enums"]["location_mode"]
           project_id?: string
@@ -316,6 +319,7 @@ export type Database = {
           created_at: string | null
           current_stage: Database["public"]["Enums"]["stage_key"]
           description: string | null
+          fts: unknown
           id: string
           owner_id: string
           slug: string | null
@@ -332,6 +336,7 @@ export type Database = {
           created_at?: string | null
           current_stage?: Database["public"]["Enums"]["stage_key"]
           description?: string | null
+          fts?: unknown
           id?: string
           owner_id: string
           slug?: string | null
@@ -348,6 +353,7 @@ export type Database = {
           created_at?: string | null
           current_stage?: Database["public"]["Enums"]["stage_key"]
           description?: string | null
+          fts?: unknown
           id?: string
           owner_id?: string
           slug?: string | null

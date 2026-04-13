@@ -6,7 +6,9 @@
     "notifications": "Notifications",
     "logout": "Logout",
     "login": "Sign In",
-    "brand": "Nur Combinator"
+    "brand": "Nur Combinator",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
   },
   "landing": {
     "title": "Nur Combinator",
@@ -60,7 +62,8 @@
     "stage": "Stage",
     "type": "Type",
     "callType": "Call Type",
-    "location": "Location"
+    "location": "Location",
+    "addTag": "Add tag (Enter)"
   },
   "projectCreate": {
     "title": "Create New Project",

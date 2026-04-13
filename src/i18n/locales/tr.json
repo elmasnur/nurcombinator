@@ -6,7 +6,9 @@
     "notifications": "Bildirimler",
     "logout": "Çıkış",
     "login": "Giriş Yap",
-    "brand": "Nur Combinator"
+    "brand": "Nur Combinator",
+    "lightMode": "Aydınlık Mod",
+    "darkMode": "Karanlık Mod"
   },
   "landing": {
     "title": "Nur Combinator",
@@ -60,7 +62,8 @@
     "stage": "Evre",
     "type": "Tür",
     "callType": "Çağrı Türü",
-    "location": "Konum"
+    "location": "Konum",
+    "addTag": "Etiket ekle (Enter)"
   },
   "projectCreate": {
     "title": "Yeni Proje Oluştur",
