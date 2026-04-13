@@ -47,6 +47,9 @@ export default function Navbar() {
             {t('nav.explore')}
           </Link>
           <LanguageSwitcher />
+          <button onClick={toggleTheme} className="text-muted-foreground hover:text-foreground transition" aria-label="Toggle theme">
+            {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           {user ? (
             <>
               <Link to={`${prefix}/projects/new`} className="text-sm text-muted-foreground transition hover:text-foreground">
