@@ -89,6 +89,10 @@ export default function Navbar() {
           <div className="flex flex-col gap-3">
             <Link to={`${prefix}/explore`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.explore')}</Link>
             <div onClick={() => setMenuOpen(false)}><LanguageSwitcher /></div>
+            <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-muted-foreground">
+              {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {resolvedTheme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+            </button>
             {user ? (
               <>
                 <Link to={`${prefix}/projects/new`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.createProject')}</Link>
