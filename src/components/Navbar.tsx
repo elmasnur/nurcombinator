@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalizedNavigate, useLocalizedPath } from '@/hooks/useLocalizedNavigate';
 import { useTranslation } from 'react-i18next';
@@ -8,13 +8,15 @@ import { useTheme } from '@/hooks/useTheme';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { getLangFromPath } from '@/i18n';
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
   const navigate = useLocalizedNavigate();
   const lp = useLocalizedPath();
   const { t } = useTranslation();
-  const { lang } = useParams<{ lang: string }>();
+  const location = useLocation();
+  const lang = getLangFromPath(location.pathname);
   const [unreadCount, setUnreadCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
@@ -31,13 +33,12 @@ export default function Navbar() {
       .then(({ count }) => setUnreadCount(count ?? 0));
   }, [user]);
 
-  // If we're outside /:lang routes (e.g. 404), fallback
-  const prefix = lang ? `/${lang}` : '/tr';
+  const prefix = `/${lang}`;
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <Link to={`${prefix}`} className="font-display text-xl font-bold text-gradient-gold">
+        <Link to={prefix} className="font-display text-xl font-bold text-gradient-gold">
           {t('nav.brand')}
         </Link>
 
