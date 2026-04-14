@@ -22,4 +22,9 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
+export function getLangFromPath(pathname: string): SupportedLang {
+  const seg = pathname.split('/')[1];
+  return SUPPORTED_LANGS.includes(seg as SupportedLang) ? (seg as SupportedLang) : DEFAULT_LANG;
+}
+
 export default i18n;
