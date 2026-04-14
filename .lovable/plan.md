@@ -1,74 +1,36 @@
-# Kalan 3 Özellik Uygulama Planı
 
-Çoklu dil desteği zaten tamamlandı (react-i18next + URL routing). Aşağıdaki 3 özellik uygulanacak.
 
----
+# Dil Uyumluluğu Düzeltme Planı
 
-## 1. Karanlık/Aydınlık Tema Desteği
+## Kök Neden
 
-Mevcut CSS değişkenleri yalnızca koyu tema içeriyor. Aydınlık tema eklenecek.
+`Navbar` bileşeni `<Routes>` dışında render ediliyor. Bu yüzden `useParams()` hiçbir zaman `lang` parametresini alamıyor — her zaman `undefined` dönüyor. Sonuç:
+- Logo her zaman `/tr`'ye yönlendiriyor (fallback)
+- `LanguageSwitcher` mevcut dili okuyamıyor, sadece 1 kere çalışıyor
 
-- `**src/index.css**`: Mevcut `:root` değişkenlerini aydınlık tema değerleri olarak ayarla, koyu tema değişkenlerini `.dark` altına taşı
-- `**src/hooks/useTheme.ts**` (yeni): localStorage'dan tema oku, sistem tercihini kontrol et, `<html>` elementine `.dark` class'ı ekle/kaldır
-- `**src/components/Navbar.tsx**`: Sun/Moon toggle butonu ekle
-- `**index.html**`: İlk yüklemede flash önlemek için script ile `dark` class kontrolü
+## Çözüm
 
-Aydınlık tema renkleri: beyaz/krem arka plan, koyu metin, altın vurgular korunacak.
+URL'den dili okumak için `useParams` yerine `useLocation` kullanılacak. Tüm ilgili bileşenler ve hook'lar güncellenecek.
 
----
+### Değişiklikler
 
-## 2. Gelişmiş Arama
+1. **Yardımcı fonksiyon oluştur** — URL pathname'den dil kodunu parse eden bir `getLangFromPath(pathname)` fonksiyonu (`src/i18n/index.ts`'e eklenebilir)
 
-### Veritabanı Değişiklikleri (Migration)
+2. **`Navbar.tsx`** — `useParams` yerine `useLocation` + `getLangFromPath` kullan. `prefix` değişkeni URL'den doğru dili alsın.
 
-- `projects` tablosuna `fts` tsvector sütunu + GIN index + trigger (title + summary + description üzerinden)
-- `open_calls` tablosuna `fts` tsvector sütunu + GIN index + trigger (title + description üzerinden)
-- Mevcut verileri doldurmak için UPDATE ifadesi
+3. **`LanguageSwitcher.tsx`** — `useParams` yerine `useLocation` + `getLangFromPath` kullan. Böylece mevcut dili her zaman doğru okuyup, toggle düzgün çalışsın.
 
-### Kod Değişiklikleri
+4. **`useLocalizedNavigate.ts`** — `useParams` yerine `useLocation` + `getLangFromPath` kullan. Sayfa geçişlerinde aktif dili koruyacak.
 
-- `**src/lib/queries.ts**`: `textSearch()` fonksiyonu ile tam metin arama, `contains` ile çoklu tag filtresi
-- `**src/pages/Explore.tsx**`: 
-  - Tag input'u multi-select chip arayüzüne dönüştür
-  - Debounce ile arama optimizasyonu
-  - Konum filtresi (open calls için location_mode zaten var, projects için de eklenebilir)
+### Teknik Detay
 
----
+```ts
+// src/i18n/index.ts'e eklenecek
+export function getLangFromPath(pathname: string): SupportedLang {
+  const seg = pathname.split('/')[1];
+  return SUPPORTED_LANGS.includes(seg as SupportedLang) ? seg as SupportedLang : DEFAULT_LANG;
+}
+```
 
-## 3. E-posta Bildirimleri (Resend)
+Bu sayede `Navbar`, `LanguageSwitcher` ve `useLocalizedNavigate` her zaman URL'deki güncel dili okuyacak — `useParams`'a bağımlılık kalkacak.
 
-Haftalık özet e-postası birden fazla kullanıcıya gönderildiği için bu bir toplu/bülten e-postasıdır. Resend entegrasyonu ile yapılacak.
-
-### Kurulum
-
-- Resend connector'ü bağla (kullanıcıdan API key istenecek)
-- `email_preferences` tablosu oluştur (user_id, weekly_digest, language)
-
-### Edge Function: `send-weekly-digest`
-
-- Son 7 günde eklenen yeni projeleri sorgula
-- Aktif açık çağrıları listele
-- Opt-in kullanıcılara Resend gateway üzerinden HTML e-posta gönder
-- E-posta içeriği: yeni projeler, öne çıkan açık çağrılar, platform haberleri
-
-### Zamanlama
-
-- `pg_cron` + `pg_net` ile haftalık (her Pazartesi) cron job
-
-### İşlem Bazlı Bildirimler (Lovable Email)
-
-- Yeni başvuru geldiğinde proje sahibine e-posta
-- Başvuru durumu değiştiğinde başvurana e-posta
-- Lovable'ın yerleşik e-posta altyapısı kullanılacak
-
-### Profil Sayfası
-
-- `MyProfile.tsx`'e e-posta tercih toggle'ı ekle (haftalık özet açık/kapalı)
-
----
-
-## Uygulama Sırası
-
-1. Tema toggle (DB değişikliği yok, hızlı)
-2. Gelişmiş arama (DB migration + UI)
-3. E-posta bildirimleri (Resend bağlantısı + DB + Edge Functions)
