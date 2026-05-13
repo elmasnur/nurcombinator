@@ -108,7 +108,7 @@ export default function ProjectSignalCard() {
 
         <div className="relative space-y-2.5">
           <SignalRow
-            icon={<Users className="h-4 w-4 text-accent-sky-foreground" />}
+            icon={<Users className="h-4 w-4 text-accent-sky" />}
             label={t('landing.signal.needLabel')}
             value={t('landing.signal.needValue')}
             percent={82}
@@ -116,7 +116,7 @@ export default function ProjectSignalCard() {
             bar="bg-gradient-to-r from-accent-sky to-accent-sky/70"
           />
           <SignalRow
-            icon={<TrendingUp className="h-4 w-4 text-success-foreground" />}
+            icon={<TrendingUp className="h-4 w-4 text-success" />}
             label={t('landing.signal.openingLabel')}
             value={t('landing.signal.openingValue')}
             percent={68}
@@ -124,7 +124,7 @@ export default function ProjectSignalCard() {
             bar="bg-gradient-to-r from-success to-success/70"
           />
           <SignalRow
-            icon={<ShieldCheck className="h-4 w-4 text-accent-amber-foreground" />}
+            icon={<ShieldCheck className="h-4 w-4 text-accent-amber" />}
             label={t('landing.signal.riskLabel')}
             value={t('landing.signal.riskValue')}
             percent={55}
