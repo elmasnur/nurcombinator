@@ -30,7 +30,7 @@ export default function AudienceSection() {
             {items.map(({ icon: Icon, key, tone }) => (
               <div
                 key={key}
-                className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-ivory p-5 shadow-soft-1 transition hover:-translate-y-0.5 hover:border-accent-amber/40 hover:shadow-soft-2"
+                className="surface-premium hairline-top group relative flex items-center gap-4 rounded-2xl border border-border/70 bg-ivory p-5 shadow-soft-1 transition hover:-translate-y-0.5 hover:border-accent-amber/55 hover:shadow-soft-2 dark:border-white/10"
               >
                 <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${tone}`}>
                   <Icon className="h-5 w-5" />
