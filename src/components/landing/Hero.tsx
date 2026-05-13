@@ -39,7 +39,7 @@ export default function Hero() {
               <Sparkles className="h-3.5 w-3.5" />
               {t('landing.heroChip1')}
             </span>
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-accent-sky/25 bg-accent-sky-soft/80 px-3 text-xs font-medium text-accent-sky-foreground shadow-[inset_0_1px_0_hsl(0_0%_100%/0.6)] backdrop-blur">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-accent-sky/30 bg-accent-sky-soft/80 px-3 text-xs font-medium text-accent-sky dark:text-accent-sky-foreground shadow-[inset_0_1px_0_hsl(0_0%_100%/0.6)] backdrop-blur">
               <Heart className="h-3.5 w-3.5" />
               {t('landing.heroChip2')}
             </span>
