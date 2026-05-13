@@ -161,6 +161,7 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "cv11";
+    overflow-x: clip;
   }
 
   h1, h2, h3 {

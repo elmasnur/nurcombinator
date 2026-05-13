@@ -16,7 +16,7 @@ function Divider() {
 
 export default function Landing() {
   return (
-    <div className="bg-ivory text-slate-deep">
+    <div className="overflow-x-clip bg-ivory text-slate-deep">
       <Hero />
       <Divider />
       <ModelSection />
