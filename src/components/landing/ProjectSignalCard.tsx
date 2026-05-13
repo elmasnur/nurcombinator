@@ -52,7 +52,7 @@ function SignalRow({
   bar: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-border/50 bg-ivory/70 p-3.5 transition hover:bg-ivory">
+    <div className="surface-premium relative flex items-center gap-3 rounded-2xl border border-border/60 bg-ivory/70 p-3.5 transition hover:bg-ivory dark:border-white/10">
       <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>{icon}</div>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
@@ -60,9 +60,9 @@ function SignalRow({
             <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
             <div className="truncate text-[13px] font-semibold leading-snug text-slate-deep">{value}</div>
           </div>
-          <div className="font-mono text-sm font-semibold text-slate-deep">{percent}%</div>
+          <div className="font-mono text-sm font-semibold text-slate-deep tabular-nums">{percent}%</div>
         </div>
-        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border/50">
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border/50 dark:bg-white/10">
           <div className={`h-full rounded-full ${bar}`} style={{ width: `${percent}%` }} />
         </div>
       </div>
@@ -74,14 +74,14 @@ export default function ProjectSignalCard() {
   const { t } = useTranslation();
   return (
     <div className="relative animate-fade-in">
-      <div aria-hidden className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-accent-amber/15 via-accent-sky/10 to-accent-violet/15 blur-2xl" />
-      <div className="glass-card shadow-soft-3 relative rounded-[28px] p-5 md:p-6">
+      <div aria-hidden className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-accent-amber/15 via-accent-sky/10 to-accent-violet/15 blur-2xl dark:from-accent-amber/8 dark:via-accent-sky/6 dark:to-accent-violet/8" />
+      <div className="glass-card hairline-top shadow-soft-3 relative rounded-[28px] p-5 md:p-6">
         {/* faint inner grid */}
         <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[28px] bg-grid-soft opacity-[0.04]" />
 
         <div className="relative mb-5 flex items-center justify-between">
           <div className="font-display text-base font-bold tracking-tight text-slate-deep">{t('landing.signal.title')}</div>
-          <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-ivory/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <div className="surface-premium relative flex items-center gap-1.5 rounded-full border border-border/60 bg-ivory/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground dark:border-white/10">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-sky opacity-60" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent-sky" />
@@ -91,7 +91,7 @@ export default function ProjectSignalCard() {
           </div>
         </div>
 
-        <div className="relative mb-4 rounded-2xl border border-border/50 bg-ivory/70 p-4">
+        <div className="surface-premium relative mb-4 rounded-2xl border border-border/60 bg-ivory/70 p-4 dark:border-white/10">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-accent-violet-soft">
