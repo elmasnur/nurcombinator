@@ -33,7 +33,7 @@ export default function Hero() {
       </div>
 
       <div className="container relative mx-auto grid items-center gap-12 px-4 py-16 md:py-20 lg:grid-cols-12 lg:gap-10 lg:py-28">
-        <div className="lg:col-span-7 animate-fade-in">
+        <div className="min-w-0 lg:col-span-7 animate-fade-in">
           <div className="mb-6 flex flex-wrap gap-2">
             <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-accent-amber/25 bg-accent-amber-soft/80 px-3 text-xs font-medium text-accent-amber-foreground dark:text-accent-amber shadow-[inset_0_1px_0_hsl(0_0%_100%/0.6)] backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" />
@@ -71,12 +71,12 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="min-w-0 lg:col-span-5">
           <ProjectSignalCard />
         </div>
 
         {/* Hero pill row + metric strip */}
-        <div className="lg:col-span-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="min-w-0 lg:col-span-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {pills.map(({ icon: Icon, title, desc, tone }) => (
             <div key={title} className="surface-premium group relative flex items-center gap-3 rounded-2xl border border-border/70 p-4 backdrop-blur transition hover:-translate-y-0.5 hover:border-accent-amber/45 shadow-soft-1 hover:shadow-soft-2 dark:border-white/10 dark:hover:border-accent-amber/55">
               <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>
