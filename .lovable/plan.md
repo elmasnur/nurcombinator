@@ -1,98 +1,68 @@
 
-# Landing Sayfası Redesign — Audit Raporu
+# Landing Refinement — Reference Görsele Hizalama
 
-## 1. Mevcut Route / Dosya Haritası
+Mevcut redesign çatısı doğru kuruldu (token, i18n, bölümler). Ancak yüklenen referans görsel daha zengin: chip badge'ler, feature pill kartları, renkli stage kartları, oklu audience grid, yatay 8 adımlı flow ve mandala-glow'lu koyu Final CTA. Bu plan eksiksiz görsel paritesi için odaklı düzeltmeleri kapsar.
 
-**Genel public landing route'u:**
-- `/` ve `/:lang` (örn. `/tr`, `/en`) → `LanguageRedirect` → `LanguageLayout` → `<Landing />`
-- Tanım: `src/App.tsx` (satır 36, 50–51)
-- Bileşen: `src/pages/Landing.tsx`
+## Kapsam
 
-**Landing bileşeninin doğrudan bağımlılıkları:**
-- `src/components/Navbar.tsx` (global, App.tsx içinde Routes dışında render — landing dahil her sayfada görünür)
-- `src/components/LanguageLayout.tsx` (i18n wrapper, dil senkronizasyonu)
-- `src/components/LanguageSwitcher.tsx` (Navbar içinden)
-- `src/components/ui/button.tsx` (shadcn)
-- `src/hooks/useAuth.tsx`, `src/hooks/useLocalizedNavigate.ts`, `src/hooks/useTheme.ts`
-- i18n kaynakları: `src/i18n/index.ts`, `src/i18n/locales/{tr,en}.json` (`landing.*` anahtarları)
-- İkonlar: `lucide-react` (`ArrowRight`, `Shield`, `Users`, `Compass`)
+Sadece landing yüzeyi. Auth, route, Navbar (global), backend, db değişmez.
 
-**Landing'in mevcut bölümleri (Landing.tsx):**
-1. Hero (title, subtitle, iki CTA)
-2. How It Works — 3 adım
-3. Principles — 3 ilke (Shield/Compass/Users)
-4. Footer (basit metin)
+## Değişecek / eklenecek dosyalar
 
-> AGENTS.md kanonik yapısına göre mevcut sayfada **eksik**: Project Signal dashboard kartı, Model section (4 kart), Stage Map (6 evre), Audience section, 12-Week Flow (8 adım), güçlü Final CTA.
+**Düzenle:**
+- `src/index.css` — yeni utility'ler: `.bg-mesh-radial` (mandala glow), `.shadow-elevated`, küçük token rötuşu (gerekirse).
+- `src/components/landing/Hero.tsx` — chip badge sırası, primary CTA amber'a çevrilecek, headline'da son kelime (`istikamet.`) italic+amber span; hero altına 3 feature pill kartı + 2 metric kart şeridi taşınacak (Project Signal kartı yalnızca metrikleri kendi içinde tutacak; geniş metrik blokları hero alt grid'ine alınacak).
+- `src/components/landing/ProjectSignalCard.tsx` — üst kısımda evre dot-progress bar (6 nokta), 4 satır + sağda yüzde mini-progress; mandala-stil sade.
+- `src/components/landing/ModelSection.tsx` — kart layout'u: solda yuvarlak renkli icon badge, sağda title+desc, ince border. Renkler: amber, sky, violet, warm-orange.
+- `src/components/landing/StageMapSection.tsx` — 6 renkli kart (her kart farklı pastel zemin: amber/sky/violet/emerald/orange/sky), üstte numara rozeti, ortada başlık+kısa metin, altta büyük tek icon. Mobilde tek kolon, lg'de 6 kolon.
+- `src/components/landing/AudienceSection.tsx` — **4 karta indir** (kullanıcı yeni listeyi verdi), 2 kolonlu grid; her kartta sol icon, başlık+desc, sağda chevron oku. Kısa intro: "İyiliği artıran, ilme ve topluma fayda sunan projeler için tasarlandı."
+- `src/components/landing/TwelveWeekFlowSection.tsx` — 8 kart yatay grid (lg:grid-cols-8, md:grid-cols-4, sm:grid-cols-2). Her kart: numara üstte, başlık ortada, ikon altta; pastel zemin; aralarda küçük chevron sağ ok (lg ve üzeri).
+- `src/components/landing/FinalCtaSection.tsx` — koyu slate-deep zemin, ortada mandala radial glow, sol blokta headline + 6 maddeli check listesi (3'lü 2 grid), sağda amber CTA + alt sekonder login linki. Köşelerde subtle amber/sky/violet glow.
+- `src/components/landing/Footer.tsx` — 3 sütun: sol kalp+tagline, orta globe+domain, sağ küçük amber simge+motto.
+- `src/components/landing/SectionHeading.tsx` — eyebrow opsiyonel kalsın, başlıkta italic accent kelime span desteği için `accentWord` prop eklenebilir (opsiyonel).
+- `src/i18n/locales/{tr,en}.json` — `landing.hero.chips.*`, `landing.hero.pills.*`, `landing.audience.intro`, `landing.audience.a1..a4` (yeni 4 maddeye revize), `landing.finalCta.checks.*` (6 madde) anahtarları.
 
-## 2. Global Styling / Theme Gözlemleri
+**Yeni:**
+- `src/components/landing/HeroPills.tsx` — Hero altındaki "12 haftalık akış / İhtiyaç eşleşmesi / Impact Day" pill kartları + 2 büyük metric kart bandı.
+- `src/components/landing/FlowConnector.tsx` (opsiyonel, küçük chevron SVG bridging arası).
 
-- `src/index.css` — light tema zaten warm ivory (`--background: 40 20% 97%`) + amber primary (`--primary: 40 72% 42%` gold) üzerine kurulu. Foreground deep slate (`220 20% 12%`). `.dark` varyantı tanımlı.
-- Custom tokens: `--gold`, `--gold-dim`, `--gold-glow`, `--surface-raised`, `--success`, `--warning`, `--info`. Utility'ler: `text-gradient-gold`, `glow-gold`, `surface-raised`.
-- `tailwind.config.ts` — semantic token'lar map'lenmiş, `gold` rengi extend edilmiş, fontlar (`Playfair Display` display, `Open Sans` sans, `Crimson Pro` serif, `Roboto Mono` mono), `fade-in` ve `shimmer` animasyonları tanımlı.
-- Yeni redesign için **eksik token'lar**: sky accent, violet accent. Bunlar `index.css` + `tailwind.config.ts`'e HSL semantic token olarak eklenmeli.
-- Animasyon: yalnızca `tailwindcss-animate` mevcut. Framer-motion / GSAP yok.
+## Tasarım kuralları
 
-## 3. Reuse vs Rebuild Tavsiyesi
+- Tema: light (ivory) varsayılan; sadece Final CTA bloğu koyu slate-deep.
+- Renk semantik token: `accent-amber` (primary CTA), `accent-sky`, `accent-violet`, ek pastel softlar (`-soft` varyantları zaten var).
+- Tipografi: Playfair Display başlık (mevcut), gövde Open Sans.
+- Motion: `animate-fade-in` (zaten var) + Tailwind `transition` hover-lift; framer-motion **eklenmeyecek**.
+- Mobil: tüm grid'ler 1 kolon stack; flow yatayda mobil için snap-scroll yerine wrap (md:2 lg:8); audience 1 kolon (md:2).
+- Erişilebilirlik: `<header>/<section>/<footer>` semantik (zaten kullanılıyor), `aria-label` butonlarda, focus ring shadcn varsayılanı.
 
-**Tavsiye: Componentized Rebuild (Landing'e özel).**
+## Dokunulmayacak
 
-Sebepler:
-- Mevcut `Landing.tsx` tek dosya, kanonik yapının yalnızca ~%30'unu karşılıyor (3 bölüm vs gereken 8).
-- Project Signal kartı, Stage Map, 12-Week Flow gibi bölümler özgün, tekrar kullanılabilir landing bileşenleri olarak en temiz şekilde yeni dosyalara bölünür.
-- Mevcut hero copy ve i18n key yapısı (`landing.*`) **korunabilir ve genişletilebilir** — i18n kontratı tamamen yeniden yazılmamalı, üstüne eklenmeli.
+- `src/components/Navbar.tsx`, `App.tsx` route'ları, auth, supabase, edge functions, migrations, diğer sayfalar.
+- Eski landing key'leri (`landing.howItWorks` vb.) silinmeyecek.
+- Karanlık varsayılan tema **kurulmayacak**; mevcut tema toggle korunacak.
 
-Yeniden kullanılacaklar:
-- `Navbar`, `Button`, `Card` (shadcn), `Badge`, `Progress`, semantic Tailwind token'ları, mevcut i18n altyapısı, `useAuth`, `useLocalizedPath`.
+## Riskler
 
-Yeniden inşa edilecek:
-- `Landing.tsx` (orchestrator — sadece sectionları sırasıyla render eden ince dosya)
-- Her section ayrı bileşen → `src/components/landing/` altında.
+- i18n: 4 → eski 6 audience mapping (kullanılmayan a5/a6 anahtarları korunup landing'de gösterilmeyecek — geriye dönük uyum).
+- Yatay 8'li flow lg ekran altında sıkışabilir → md:grid-cols-4 + sm:grid-cols-2 fallback ile çözülür; chevron'lar sadece lg+ görünür.
+- Mandala glow yalnızca CSS radial gradient ile yapılacak (resim asset eklenmeyecek).
 
-## 4. Önerilen Dosya Değişiklikleri / Yenileri
+## Checklist (bu görevde karşılanacaklar)
 
-**Düzenlenecek (3):**
-- `src/pages/Landing.tsx` — sadeleştir, yeni section bileşenlerini compose et.
-- `src/index.css` — sky/violet accent token'ları (`--accent-sky`, `--accent-violet` ve `-foreground` varyantları) ekle, hem `:root` hem `.dark` için.
-- `tailwind.config.ts` — yeni accent token'larını `colors` extend'ine ekle.
-- `src/i18n/locales/tr.json` ve `src/i18n/locales/en.json` — yeni section'lar için `landing.*` anahtarları ekle (model, stages, audience, flow, signal, finalCta). Mevcut anahtarlar korunur.
+- [x] Header: mevcut Navbar korunur (kapsam dışı, kullanıcı kuralı)
+- [x] Hero: chip + headline + amber CTA + secondary
+- [x] Project Signal kart (dot stage + satır yüzdeleri)
+- [x] Model section (4 kart)
+- [x] Stage map (6 renkli kart + icon)
+- [x] Audience (4 kart, oklu)
+- [x] 12 haftalık akış (8 kart yatay)
+- [x] Final CTA (koyu slate, mandala glow, 6 check)
+- [x] Footer (3 sütun)
+- [x] Responsive (sm/md/lg breakpoint testi)
+- [x] Auth/backend/db dokunulmadı
+- [x] Karanlık varsayılan yok
+- [x] Sahte logo/testimonial/pricing yok
 
-**Oluşturulacak (`src/components/landing/`):**
-- `Hero.tsx` — kanonik Türkçe headline + supporting copy + ana CTA'lar.
-- `ProjectSignalCard.tsx` — premium glass dashboard kartı (Evre/İhtiyaç/Sinyal/Risk + progress + 2 metric kart). UI placeholder verisi statik.
-- `ModelSection.tsx` — 4 kart (Evre Tespiti, İhtiyaç Pazarı, Mentor & Peer Match, Emanet Filtresi).
-- `StageMapSection.tsx` — 6 olgunlaşma evresi (yatay/dikey timeline).
-- `AudienceSection.tsx` — hedef proje türleri grid.
-- `TwelveWeekFlowSection.tsx` — 8 adımlık akış.
-- `FinalCtaSection.tsx` — kanonik headline + "Connect'e Başla" + login linki.
-- `Footer.tsx` — elegant microcopy (`İyiliği artıran her proje…`, `connect.nurai.app`).
-- (Opsiyonel) `src/components/landing/SectionHeading.tsx` — paylaşılan başlık.
+## Build doğrulaması
 
-**Dokunulmayacak:**
-- `src/App.tsx` route tablosu (yalnızca Landing'in kendisi değişir; route ve bileşen adı aynı).
-- `Navbar`, `LanguageLayout`, `LanguageRedirect`, auth, queries, supabase entegrasyonu, edge functions, migrations.
-- Tüm `/:lang/*` korumalı uygulama route'ları: `auth`, `explore`, `projects/new`, `p/:slug`, `p/:slug/dashboard`, `p/:slug/open-calls/new`, `open-calls/:id`, `me`, `me/applications`, `me/notifications`, `admin/moderation`.
-
-## 5. Mevcut Bağımlılıklar
-
-- **UI**: shadcn/ui (radix tabanlı, tüm temel parçalar mevcut: Card, Button, Badge, Progress, Tabs, vb.)
-- **İkonlar**: `lucide-react` ^0.462 — yeterli.
-- **Motion**: yok. AGENTS.md "subtle entrance + hover" istiyor → **framer-motion eklenmesi önerilir** (yalnızca landing için, küçük bağımlılık). Alternatif: sadece Tailwind keyframe + `tailwindcss-animate` ile yetinmek (motion'sız da kanonik kuralları karşılar).
-- **Tailwind**: v3.4 + animate plugin, typography plugin mevcut. Konfigürasyon HSL semantic token kuralına uyumlu.
-
-## 6. Riskler
-
-- **i18n drift**: Çok sayıda yeni `landing.*` key'i geliyor; iki dilde birbirine eşit tutulmazsa runtime'da key görünür. → Aynı anda hem `tr.json` hem `en.json` güncellenmeli.
-- **Token genişletmesi**: sky/violet accent eklenirken dark mod karşılıkları unutulursa kontrast bozulur. → Her token `:root` + `.dark`'a paralel eklenecek.
-- **Motion bağımlılığı kararı**: framer-motion eklenecekse bundle ~50KB artar. Kullanıcı onayı alınmalı.
-- **Glassmorphism + light tema**: warm ivory zeminde glass efektin görünür olması için gölge/blur değerlerinin dikkatli ayarı gerekir. Tasarım yönü için isteğe bağlı `design--create_directions` adımı önerilir.
-- **Mevcut sade landing'in trafiği**: redesign yayına çıktığında mevcut linkler / SEO meta'ları (index.html title/desc) güncel tutulmalı; bu plan kapsamına alınabilir.
-
-## 7. Checklist
-
-- [x] Mevcut landing route belirlendi: `/:lang` index → `src/pages/Landing.tsx`
-- [x] Sayfayı kontrol eden dosyalar listelendi (Landing.tsx + Navbar + i18n + tema)
-- [x] Global stil/tema dosyaları belirlendi (`src/index.css`, `tailwind.config.ts`)
-- [x] Bağımlılıklar kontrol edildi (shadcn, lucide, react-i18next, motion yok)
-- [x] Korunacak auth/app route'ları listelendi (kapsam dışı)
-- [x] Bu adımda redesign uygulanmadı; sadece audit + plan üretildi.
+Uygulama tamamlandıktan sonra harness otomatik build çalıştırır; hata olursa düzeltilir.
