@@ -1,37 +1,62 @@
 import { useTranslation } from 'react-i18next';
-import { Activity, AlertTriangle, Compass, Sparkles, Users, Megaphone } from 'lucide-react';
+import { Activity, Rocket, Users, TrendingUp, ShieldCheck } from 'lucide-react';
 
-function Row({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent: string }) {
+function StageDots({ active = 3, total = 6 }: { active?: number; total?: number }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-border/60 bg-ivory/70 p-3 backdrop-blur">
-      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${accent}`}>{icon}</div>
-      <div className="min-w-0">
-        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="mt-0.5 truncate text-sm font-semibold text-slate-deep">{value}</div>
-      </div>
+    <div className="flex items-center gap-1.5">
+      {Array.from({ length: total }).map((_, i) => {
+        const reached = i <= active;
+        return (
+          <div key={i} className="flex flex-1 items-center gap-1.5">
+            <span
+              className={`h-2.5 w-2.5 rounded-full transition ${
+                i === active
+                  ? 'bg-accent-violet ring-4 ring-accent-violet/20'
+                  : reached
+                  ? 'bg-accent-violet'
+                  : 'bg-border'
+              }`}
+            />
+            {i < total - 1 && (
+              <span className={`h-0.5 flex-1 rounded-full ${i < active ? 'bg-accent-violet' : 'bg-border'}`} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-function ProgressRow({ label, value, color }: { label: string; value: number; color: string }) {
+function SignalRow({
+  icon,
+  label,
+  value,
+  percent,
+  tone,
+  bar,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  percent: number;
+  tone: string;
+  bar: string;
+}) {
   return (
-    <div>
-      <div className="mb-1.5 flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="font-mono font-medium text-slate-deep">{value}%</span>
+    <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-ivory/60 p-3">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}>{icon}</div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
+            <div className="truncate text-sm font-semibold text-slate-deep">{value}</div>
+          </div>
+          <div className="font-mono text-xs font-semibold text-slate-deep">{percent}%</div>
+        </div>
+        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-border/60">
+          <div className={`h-full rounded-full ${bar}`} style={{ width: `${percent}%` }} />
+        </div>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function Metric({ value, label, accent }: { value: string; label: string; accent: string }) {
-  return (
-    <div className="rounded-xl border border-border/60 bg-ivory/70 p-3 backdrop-blur">
-      <div className={`font-display text-2xl font-bold ${accent}`}>{value}</div>
-      <div className="mt-1 text-[11px] leading-tight text-muted-foreground">{label}</div>
     </div>
   );
 }
@@ -42,37 +67,49 @@ export default function ProjectSignalCard() {
     <div className="relative animate-fade-in">
       <div aria-hidden className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-accent-amber/20 via-accent-sky/10 to-accent-violet/20 blur-2xl" />
       <div className="glass-card relative rounded-3xl p-5 md:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-deep text-ivory">
-              <Activity className="h-4 w-4" />
+        <div className="mb-5 flex items-center justify-between">
+          <div className="font-display text-base font-bold text-slate-deep">{t('landing.signal.title')}</div>
+          <Activity className="h-4 w-4 text-accent-sky" />
+        </div>
+
+        <div className="mb-4 rounded-xl border border-border/50 bg-ivory/60 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Rocket className="h-4 w-4 text-accent-violet" />
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t('landing.signal.stageLabel')}
+              </span>
             </div>
-            <div>
-              <div className="font-display text-base font-bold text-slate-deep">{t('landing.signal.title')}</div>
-              <div className="text-[11px] text-muted-foreground">{t('landing.signal.subtitle')}</div>
-            </div>
+            <span className="text-sm font-semibold text-slate-deep">{t('landing.signal.stageValue')}</span>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-amber-soft px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent-amber-foreground">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-amber" />
-            {t('landing.signal.placeholder')}
-          </span>
+          <StageDots active={2} total={6} />
         </div>
 
         <div className="space-y-2.5">
-          <Row icon={<Compass className="h-4 w-4 text-accent-sky-foreground" />} label={t('landing.signal.stageLabel')} value={t('landing.signal.stageValue')} accent="bg-accent-sky" />
-          <Row icon={<Sparkles className="h-4 w-4 text-accent-amber-foreground" />} label={t('landing.signal.needLabel')} value={t('landing.signal.needValue')} accent="bg-accent-amber" />
-          <Row icon={<Megaphone className="h-4 w-4 text-accent-violet-foreground" />} label={t('landing.signal.openingLabel')} value={t('landing.signal.openingValue')} accent="bg-accent-violet" />
-          <Row icon={<AlertTriangle className="h-4 w-4 text-warning-foreground" />} label={t('landing.signal.riskLabel')} value={t('landing.signal.riskValue')} accent="bg-warning" />
-        </div>
-
-        <div className="mt-5 space-y-3">
-          <ProgressRow label={t('landing.signal.stageProgress')} value={62} color="bg-gradient-to-r from-accent-amber to-accent-amber/70" />
-          <ProgressRow label={t('landing.signal.trustProgress')} value={78} color="bg-gradient-to-r from-accent-sky to-accent-violet" />
-        </div>
-
-        <div className="mt-5 grid grid-cols-2 gap-2.5">
-          <Metric value="24" label={t('landing.signal.metricMentors')} accent="text-accent-violet" />
-          <Metric value="61" label={t('landing.signal.metricNeeds')} accent="text-accent-amber" />
+          <SignalRow
+            icon={<Users className="h-4 w-4 text-accent-sky-foreground" />}
+            label={t('landing.signal.needLabel')}
+            value={t('landing.signal.needValue')}
+            percent={82}
+            tone="bg-accent-sky-soft"
+            bar="bg-accent-sky"
+          />
+          <SignalRow
+            icon={<TrendingUp className="h-4 w-4 text-success-foreground" />}
+            label={t('landing.signal.openingLabel')}
+            value={t('landing.signal.openingValue')}
+            percent={68}
+            tone="bg-success/15"
+            bar="bg-success"
+          />
+          <SignalRow
+            icon={<ShieldCheck className="h-4 w-4 text-accent-amber-foreground" />}
+            label={t('landing.signal.riskLabel')}
+            value={t('landing.signal.riskValue')}
+            percent={55}
+            tone="bg-accent-amber-soft"
+            bar="bg-accent-amber"
+          />
         </div>
       </div>
     </div>

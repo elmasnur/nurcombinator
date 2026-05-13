@@ -1,12 +1,26 @@
 import { useTranslation } from 'react-i18next';
+import { Sparkles, Pencil, Upload, TrendingUp, ShieldCheck, Globe } from 'lucide-react';
 import SectionHeading from './SectionHeading';
+
+const palettes = [
+  { tint: 'bg-accent-amber-soft/60 border-accent-amber/20', num: 'bg-accent-amber text-accent-amber-foreground', icon: 'text-accent-amber' },
+  { tint: 'bg-accent-sky-soft/60 border-accent-sky/20', num: 'bg-accent-sky text-accent-sky-foreground', icon: 'text-accent-sky' },
+  { tint: 'bg-accent-violet-soft/60 border-accent-violet/20', num: 'bg-accent-violet text-accent-violet-foreground', icon: 'text-accent-violet' },
+  { tint: 'bg-success/10 border-success/20', num: 'bg-success text-success-foreground', icon: 'text-success' },
+  { tint: 'bg-accent-amber-soft/40 border-accent-amber/20', num: 'bg-accent-amber/90 text-accent-amber-foreground', icon: 'text-accent-amber' },
+  { tint: 'bg-accent-sky-soft/40 border-accent-sky/20', num: 'bg-accent-sky/90 text-accent-sky-foreground', icon: 'text-accent-sky' },
+];
+
+const icons = [Sparkles, Pencil, Upload, TrendingUp, ShieldCheck, Globe];
 
 export default function StageMapSection() {
   const { t } = useTranslation();
-  const stages = [1, 2, 3, 4, 5, 6].map((n) => ({
+  const stages = [1, 2, 3, 4, 5, 6].map((n, i) => ({
     n,
     title: t(`landing.stages.s${n}Title`),
     desc: t(`landing.stages.s${n}Desc`),
+    palette: palettes[i],
+    Icon: icons[i],
   }));
 
   return (
@@ -18,23 +32,25 @@ export default function StageMapSection() {
           subtitle={t('landing.stages.subhead')}
         />
 
-        <div className="relative mt-14">
-          <div aria-hidden className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-border to-transparent lg:block" />
-          <ol className="grid gap-6 lg:grid-cols-6">
-            {stages.map((s) => (
-              <li key={s.n} className="relative rounded-2xl border border-border/60 bg-card/40 p-5 backdrop-blur">
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-deep font-display text-sm font-bold text-ivory">
-                    {s.n}
-                  </div>
-                  <div className="h-px flex-1 bg-border/70" />
-                </div>
-                <h3 className="font-display text-base font-semibold text-slate-deep">{s.title}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          {stages.map(({ n, title, desc, palette, Icon }) => (
+            <li
+              key={n}
+              className={`relative flex flex-col rounded-2xl border ${palette.tint} p-5 transition hover:-translate-y-1 hover:shadow-[0_18px_40px_-22px_hsl(var(--slate-deep)/0.25)]`}
+            >
+              <div className="mb-3 flex items-center gap-2">
+                <span className={`flex h-7 w-7 items-center justify-center rounded-full font-display text-xs font-bold ${palette.num}`}>
+                  {n}
+                </span>
+              </div>
+              <h3 className="font-display text-base font-semibold text-slate-deep">{title}</h3>
+              <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground">{desc}</p>
+              <div className="mt-4 flex justify-start">
+                <Icon className={`h-7 w-7 opacity-80 ${palette.icon}`} />
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
