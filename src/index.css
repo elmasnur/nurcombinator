@@ -88,7 +88,7 @@
     --background: 220 20% 6%;
     --foreground: 40 20% 92%;
 
-    --card: 220 18% 10%;
+    --card: 220 18% 13%;
     --card-foreground: 40 20% 92%;
 
     --popover: 220 18% 10%;
@@ -101,7 +101,7 @@
     --secondary-foreground: 40 20% 85%;
 
     --muted: 220 14% 14%;
-    --muted-foreground: 220 10% 55%;
+    --muted-foreground: 220 10% 64%;
 
     --accent: 40 50% 20%;
     --accent-foreground: 40 72% 70%;
@@ -109,8 +109,8 @@
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
+    --border: 220 14% 28%;
+    --input: 220 14% 26%;
     --ring: 40 72% 52%;
 
     --sidebar-background: 220 18% 8%;
@@ -125,7 +125,7 @@
     --gold: 40 72% 52%;
     --gold-dim: 40 50% 35%;
     --gold-glow: 40 80% 62%;
-    --surface-raised: 220 16% 12%;
+    --surface-raised: 220 16% 16%;
     --surface-overlay: 220 18% 8%;
     --success: 150 60% 40%;
     --success-foreground: 150 60% 90%;
@@ -142,8 +142,8 @@
     --accent-amber: 40 90% 60%;
     --accent-amber-foreground: 30 60% 12%;
     --accent-amber-soft: 40 60% 18%;
-    --ivory: 220 18% 10%;
-    --ivory-deep: 220 20% 7%;
+    --ivory: 220 18% 12%;
+    --ivory-deep: 220 20% 6%;
     --slate-deep: 40 20% 92%;
     --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     --font-serif: "Crimson Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
