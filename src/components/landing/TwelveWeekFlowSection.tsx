@@ -48,16 +48,16 @@ export default function TwelveWeekFlowSection() {
         <div className="mt-14 grid gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
           {steps.map(({ n, label, Icon, tint, iconTone }, i) => (
             <div key={n} className="relative">
-              <div className={`flex h-full min-h-[10.5rem] flex-col rounded-2xl border border-border/50 ${tint} p-4 shadow-soft-1 transition hover:-translate-y-0.5 hover:shadow-soft-2`}>
+              <div className={`surface-premium relative flex h-full min-h-[10.5rem] flex-col rounded-2xl border border-border/60 ${tint} p-4 shadow-soft-1 transition hover:-translate-y-0.5 hover:border-accent-amber/45 hover:shadow-soft-2 dark:border-white/10`}>
                 <div className="mb-2 font-mono text-[11px] font-semibold tracking-[0.18em] text-muted-foreground">
                   {String(n).padStart(2, '0')}
                 </div>
                 <Icon className={`mb-3 h-5 w-5 ${iconTone}`} />
-                <div className="h-px w-8 bg-border/70" />
+                <div className="h-px w-8 bg-border/70 dark:bg-white/15" />
                 <p className="mt-2 text-[12.5px] font-medium leading-snug text-slate-deep">{label}</p>
               </div>
               {i < steps.length - 1 && (
-                <ChevronRight aria-hidden className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-border/70 lg:block" />
+                <ChevronRight aria-hidden className="absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-border/70 lg:block dark:text-white/20" />
               )}
             </div>
           ))}
