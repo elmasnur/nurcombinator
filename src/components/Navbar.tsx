@@ -34,6 +34,18 @@ export default function Navbar() {
   }, [user]);
 
   const prefix = `/${lang}`;
+  const isLanding = location.pathname === prefix || location.pathname === `${prefix}/`;
+  const landingAnchors = [
+    { hash: '#model', label: t('nav.model') },
+    { hash: '#evreler', label: t('nav.stages') },
+    { hash: '#program', label: t('nav.program') },
+    { hash: '#basvuru', label: t('nav.apply') },
+  ];
+
+  const scrollToHash = (hash: string) => {
+    const el = document.querySelector(hash);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
@@ -44,6 +56,16 @@ export default function Navbar() {
 
         {/* Desktop */}
         <div className="hidden items-center gap-4 md:flex">
+          {isLanding && landingAnchors.map(({ hash, label }) => (
+            <a
+              key={hash}
+              href={hash}
+              onClick={(e) => { e.preventDefault(); scrollToHash(hash); history.replaceState(null, '', `${location.pathname}${hash}`); }}
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              {label}
+            </a>
+          ))}
           <Link to={`${prefix}/explore`} className="text-sm text-muted-foreground transition hover:text-foreground">
             {t('nav.explore')}
           </Link>
@@ -88,6 +110,16 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-border bg-background px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-3">
+            {isLanding && landingAnchors.map(({ hash, label }) => (
+              <a
+                key={hash}
+                href={hash}
+                onClick={(e) => { e.preventDefault(); setMenuOpen(false); setTimeout(() => scrollToHash(hash), 50); history.replaceState(null, '', `${location.pathname}${hash}`); }}
+                className="text-sm text-muted-foreground"
+              >
+                {label}
+              </a>
+            ))}
             <Link to={`${prefix}/explore`} onClick={() => setMenuOpen(false)} className="text-sm text-muted-foreground">{t('nav.explore')}</Link>
             <div onClick={() => setMenuOpen(false)}><LanguageSwitcher /></div>
             <button onClick={toggleTheme} className="flex items-center gap-2 text-sm text-muted-foreground">

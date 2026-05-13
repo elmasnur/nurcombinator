@@ -8,7 +8,11 @@
     "login": "Giriş Yap",
     "brand": "Nur Combinator",
     "lightMode": "Aydınlık Mod",
-    "darkMode": "Karanlık Mod"
+    "darkMode": "Karanlık Mod",
+    "model": "Model",
+    "stages": "Evreler",
+    "program": "Program",
+    "apply": "Başvuru"
   },
   "landing": {
     "title": "Nur Combinator",

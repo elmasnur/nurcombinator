@@ -8,7 +8,11 @@
     "login": "Sign In",
     "brand": "Nur Combinator",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "model": "Model",
+    "stages": "Stages",
+    "program": "Program",
+    "apply": "Apply"
   },
   "landing": {
     "title": "Nur Combinator",
