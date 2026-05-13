@@ -15,7 +15,7 @@ export default function FinalCtaSection() {
   return (
     <section id="basvuru" className="scroll-mt-20 bg-ivory-deep py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4">
-        <div className="relative overflow-hidden rounded-[2rem] border border-slate-deep/30 bg-slate-deep p-8 text-ivory shadow-soft-3 md:p-12 lg:p-16">
+        <div className="noise-soft relative overflow-hidden rounded-[2.25rem] border border-slate-deep/30 bg-slate-deep p-8 text-ivory shadow-soft-3 md:p-12 lg:p-16 dark:border-white/10">
           <div aria-hidden className="pointer-events-none absolute inset-0">
             <div className="absolute -left-24 top-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full bg-accent-amber/15 blur-3xl" />
             <div className="absolute -right-32 -bottom-32 h-[30rem] w-[30rem] rounded-full bg-accent-violet/18 blur-3xl" />
@@ -43,7 +43,7 @@ export default function FinalCtaSection() {
 
           <div className="relative grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
             <div className="lg:col-span-7">
-              <h2 className="text-balance font-display text-[1.75rem] font-bold leading-[1.1] tracking-[-0.01em] md:text-[2.25rem] lg:text-[2.75rem]">
+              <h2 className="text-display-tight text-balance font-display text-[1.75rem] font-bold leading-[1.1] md:text-[2.25rem] lg:text-[2.75rem]">
                 {t('landing.finalCta.headline')}
               </h2>
               <ul className="mt-8 grid gap-2.5 sm:grid-cols-2">
