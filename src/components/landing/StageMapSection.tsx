@@ -35,12 +35,12 @@ export default function StageMapSection() {
         </div>
 
         <div className="relative mt-14">
-          <div aria-hidden className="absolute left-4 right-4 top-7 hidden border-t border-dashed border-border lg:block" />
+          <div aria-hidden className="absolute left-4 right-4 top-7 hidden border-t border-dashed border-border lg:block dark:border-white/10" />
           <ol className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             {stages.map(({ n, title, desc, palette, Icon }) => (
               <li
                 key={n}
-                className={`group relative flex h-full flex-col rounded-2xl border ${palette.tint} bg-clip-padding p-5 shadow-soft-1 transition duration-300 hover:-translate-y-1 hover:shadow-soft-2`}
+                className={`surface-premium group relative flex h-full flex-col rounded-2xl border ${palette.tint} bg-clip-padding p-5 shadow-soft-1 transition duration-300 hover:-translate-y-1 hover:shadow-soft-2 dark:border-white/10`}
               >
                 <span className={`mb-4 flex h-7 w-7 items-center justify-center rounded-full font-display text-xs font-bold shadow-soft-1 ${palette.num}`}>
                   {n}
