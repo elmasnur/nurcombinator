@@ -24,7 +24,7 @@ export default function ModelSection() {
           {cards.map(({ icon: Icon, title, desc, accent, soft }, i) => (
             <div
               key={i}
-              className="group relative rounded-2xl border border-border/60 bg-ivory p-7 shadow-soft-1 transition duration-300 hover:-translate-y-1 hover:border-accent-amber/30 hover:shadow-soft-2"
+              className="surface-premium hairline-top group relative rounded-2xl border border-border/60 bg-ivory p-7 shadow-soft-1 transition duration-300 hover:-translate-y-1 hover:border-accent-amber/55 hover:shadow-soft-2 dark:border-white/10"
             >
               <div className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full ${soft}`}>
                 <Icon className={`h-5 w-5 ${accent}`} />

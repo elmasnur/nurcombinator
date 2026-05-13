@@ -88,7 +88,7 @@
     --background: 220 20% 6%;
     --foreground: 40 20% 92%;
 
-    --card: 220 18% 10%;
+    --card: 220 18% 13%;
     --card-foreground: 40 20% 92%;
 
     --popover: 220 18% 10%;
@@ -101,7 +101,7 @@
     --secondary-foreground: 40 20% 85%;
 
     --muted: 220 14% 14%;
-    --muted-foreground: 220 10% 55%;
+    --muted-foreground: 220 10% 64%;
 
     --accent: 40 50% 20%;
     --accent-foreground: 40 72% 70%;
@@ -109,8 +109,8 @@
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
+    --border: 220 14% 28%;
+    --input: 220 14% 26%;
     --ring: 40 72% 52%;
 
     --sidebar-background: 220 18% 8%;
@@ -125,7 +125,7 @@
     --gold: 40 72% 52%;
     --gold-dim: 40 50% 35%;
     --gold-glow: 40 80% 62%;
-    --surface-raised: 220 16% 12%;
+    --surface-raised: 220 16% 16%;
     --surface-overlay: 220 18% 8%;
     --success: 150 60% 40%;
     --success-foreground: 150 60% 90%;
@@ -142,8 +142,8 @@
     --accent-amber: 40 90% 60%;
     --accent-amber-foreground: 30 60% 12%;
     --accent-amber-soft: 40 60% 18%;
-    --ivory: 220 18% 10%;
-    --ivory-deep: 220 20% 7%;
+    --ivory: 220 18% 12%;
+    --ivory-deep: 220 20% 6%;
     --slate-deep: 40 20% 92%;
     --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     --font-serif: "Crimson Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
@@ -160,11 +160,13 @@
     @apply bg-background text-foreground font-sans antialiased;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
 
   h1, h2, h3 {
     font-family: 'Playfair Display', serif;
     letter-spacing: -0.01em;
+    text-rendering: geometricPrecision;
   }
 }
 
@@ -240,4 +242,82 @@
 
   .text-pretty { text-wrap: pretty; }
   .text-balance { text-wrap: balance; }
+
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  .text-display-tight {
+    letter-spacing: -0.035em;
+    font-feature-settings: "ss01", "ss02", "dlig";
+  }
+
+  /* Premium card surface — subtle inner highlight + crisp top hairline */
+  .surface-premium {
+    position: relative;
+    background-image: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.94) 100%);
+    box-shadow:
+      inset 0 1px 0 hsl(0 0% 100% / 0.05),
+      0 1px 2px hsl(var(--slate-deep) / 0.04);
+  }
+  .dark .surface-premium {
+    background-image: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(220 18% 10%) 100%);
+    box-shadow:
+      inset 0 1px 0 hsl(40 80% 70% / 0.06),
+      inset 0 0 0 1px hsl(0 0% 100% / 0.02);
+  }
+
+  /* Hairline gold line at the top of cards */
+  .hairline-top::before {
+    content: "";
+    position: absolute;
+    inset: 0 12% auto 12%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, hsl(var(--accent-amber) / 0.55), transparent);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .ring-premium {
+    box-shadow:
+      0 0 0 1px hsl(var(--accent-amber) / 0.18),
+      0 18px 40px -22px hsl(var(--accent-amber) / 0.45);
+  }
+
+  /* Paper-grain noise overlay */
+  .noise-soft {
+    position: relative;
+  }
+  .noise-soft::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .dark .noise-soft::after { opacity: 0.08; }
+
+  /* Elegant centered separator dot */
+  .divider-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  .divider-dot::before,
+  .divider-dot::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(to right, transparent, hsl(var(--border)) 50%, transparent);
+  }
+  .divider-dot > span {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: hsl(var(--accent-amber));
+    box-shadow: 0 0 0 3px hsl(var(--accent-amber) / 0.12);
+  }
 }
