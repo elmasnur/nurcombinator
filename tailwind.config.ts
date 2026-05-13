@@ -100,6 +100,26 @@ export default {
   				DEFAULT: 'hsl(var(--info))',
   				foreground: 'hsl(var(--info-foreground))'
   			},
+  			'accent-sky': {
+  				DEFAULT: 'hsl(var(--accent-sky))',
+  				foreground: 'hsl(var(--accent-sky-foreground))',
+  				soft: 'hsl(var(--accent-sky-soft))'
+  			},
+  			'accent-violet': {
+  				DEFAULT: 'hsl(var(--accent-violet))',
+  				foreground: 'hsl(var(--accent-violet-foreground))',
+  				soft: 'hsl(var(--accent-violet-soft))'
+  			},
+  			'accent-amber': {
+  				DEFAULT: 'hsl(var(--accent-amber))',
+  				foreground: 'hsl(var(--accent-amber-foreground))',
+  				soft: 'hsl(var(--accent-amber-soft))'
+  			},
+  			ivory: {
+  				DEFAULT: 'hsl(var(--ivory))',
+  				deep: 'hsl(var(--ivory-deep))'
+  			},
+  			'slate-deep': 'hsl(var(--slate-deep))',
   			sidebar: {
   				DEFAULT: 'hsl(var(--sidebar-background))',
   				foreground: 'hsl(var(--sidebar-foreground))',

@@ -67,6 +67,18 @@
     --warning-foreground: 35 90% 15%;
     --info: 210 70% 45%;
     --info-foreground: 210 70% 95%;
+    --accent-sky: 205 85% 48%;
+    --accent-sky-foreground: 0 0% 100%;
+    --accent-sky-soft: 205 85% 94%;
+    --accent-violet: 262 70% 55%;
+    --accent-violet-foreground: 0 0% 100%;
+    --accent-violet-soft: 262 70% 95%;
+    --accent-amber: 38 95% 52%;
+    --accent-amber-foreground: 30 60% 15%;
+    --accent-amber-soft: 40 95% 92%;
+    --ivory: 40 35% 96%;
+    --ivory-deep: 36 30% 92%;
+    --slate-deep: 222 35% 14%;
     --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     --font-serif: "Crimson Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
     --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
@@ -121,6 +133,18 @@
     --warning-foreground: 35 90% 15%;
     --info: 210 70% 50%;
     --info-foreground: 210 70% 92%;
+    --accent-sky: 205 80% 60%;
+    --accent-sky-foreground: 220 30% 8%;
+    --accent-sky-soft: 205 50% 18%;
+    --accent-violet: 262 70% 68%;
+    --accent-violet-foreground: 220 30% 8%;
+    --accent-violet-soft: 262 40% 20%;
+    --accent-amber: 40 90% 60%;
+    --accent-amber-foreground: 30 60% 12%;
+    --accent-amber-soft: 40 60% 18%;
+    --ivory: 220 18% 10%;
+    --ivory-deep: 220 20% 7%;
+    --slate-deep: 40 20% 92%;
     --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     --font-serif: "Crimson Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
     --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
@@ -157,5 +181,37 @@
 
   .surface-raised {
     background-color: hsl(var(--surface-raised));
+  }
+
+  .bg-ivory {
+    background-color: hsl(var(--ivory));
+  }
+
+  .bg-ivory-deep {
+    background-color: hsl(var(--ivory-deep));
+  }
+
+  .text-slate-deep {
+    color: hsl(var(--slate-deep));
+  }
+
+  .glass-card {
+    background: linear-gradient(135deg, hsl(var(--ivory) / 0.85), hsl(var(--ivory-deep) / 0.65));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.8);
+    box-shadow:
+      0 1px 0 0 hsl(0 0% 100% / 0.6) inset,
+      0 30px 60px -20px hsl(var(--slate-deep) / 0.18),
+      0 8px 24px -8px hsl(var(--accent-amber) / 0.15);
+  }
+
+  .text-gradient-warm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(110deg, hsl(var(--slate-deep)) 0%, hsl(var(--accent-amber)) 55%, hsl(var(--accent-violet)) 100%);
+  }
+
+  .ring-soft-amber {
+    box-shadow: 0 0 0 1px hsl(var(--accent-amber) / 0.25), 0 12px 30px -12px hsl(var(--accent-amber) / 0.4);
   }
 }
