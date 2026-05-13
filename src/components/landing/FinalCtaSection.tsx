@@ -13,7 +13,7 @@ export default function FinalCtaSection() {
   const checks = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].map((k) => t(`landing.finalCta.${k}`));
 
   return (
-    <section className="bg-ivory-deep py-16 md:py-20 lg:py-24">
+    <section id="basvuru" className="scroll-mt-20 bg-ivory-deep py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4">
         <div className="relative overflow-hidden rounded-[2rem] border border-slate-deep/30 bg-slate-deep p-8 text-ivory shadow-soft-3 md:p-12 lg:p-16">
           <div aria-hidden className="pointer-events-none absolute inset-0">

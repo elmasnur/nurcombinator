@@ -11,7 +11,7 @@ export default function ModelSection() {
     { icon: ShieldCheck, title: t('landing.model.card4Title'), desc: t('landing.model.card4Desc'), accent: 'text-accent-amber', soft: 'bg-accent-amber-soft' },
   ];
   return (
-    <section className="relative bg-ivory-deep py-20 md:py-24 lg:py-28">
+    <section id="model" className="relative scroll-mt-20 bg-ivory-deep py-20 md:py-24 lg:py-28">
       <div className="container mx-auto px-4">
         <div className="mx-auto flex justify-center">
           <SectionHeading

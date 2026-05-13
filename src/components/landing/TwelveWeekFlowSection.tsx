@@ -35,7 +35,7 @@ export default function TwelveWeekFlowSection() {
   }));
 
   return (
-    <section className="relative bg-ivory py-20 md:py-24 lg:py-28">
+    <section id="program" className="relative scroll-mt-20 bg-ivory py-20 md:py-24 lg:py-28">
       <div className="container mx-auto px-4">
         <div className="mx-auto flex justify-center">
           <SectionHeading
