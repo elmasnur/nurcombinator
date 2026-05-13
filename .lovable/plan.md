@@ -1,68 +1,114 @@
 
-# Landing Refinement — Reference Görsele Hizalama
+# Premium Polish Pass — Landing Page
 
-Mevcut redesign çatısı doğru kuruldu (token, i18n, bölümler). Ancak yüklenen referans görsel daha zengin: chip badge'ler, feature pill kartları, renkli stage kartları, oklu audience grid, yatay 8 adımlı flow ve mandala-glow'lu koyu Final CTA. Bu plan eksiksiz görsel paritesi için odaklı düzeltmeleri kapsar.
+Yapı, kopya ve route'lara dokunmadan; ritim, tipografi, gölge, gradient ve mobil sıkışıklığını gidererek landing'i "designer-made" hissine taşıyacak hassas bir cila geçişi.
 
 ## Kapsam
 
-Sadece landing yüzeyi. Auth, route, Navbar (global), backend, db değişmez.
+Sadece görsel cila. Yeni bölüm yok, kopya değişmez, auth/backend/db/route dokunulmaz.
 
-## Değişecek / eklenecek dosyalar
+## Değişecek dosyalar
 
-**Düzenle:**
-- `src/index.css` — yeni utility'ler: `.bg-mesh-radial` (mandala glow), `.shadow-elevated`, küçük token rötuşu (gerekirse).
-- `src/components/landing/Hero.tsx` — chip badge sırası, primary CTA amber'a çevrilecek, headline'da son kelime (`istikamet.`) italic+amber span; hero altına 3 feature pill kartı + 2 metric kart şeridi taşınacak (Project Signal kartı yalnızca metrikleri kendi içinde tutacak; geniş metrik blokları hero alt grid'ine alınacak).
-- `src/components/landing/ProjectSignalCard.tsx` — üst kısımda evre dot-progress bar (6 nokta), 4 satır + sağda yüzde mini-progress; mandala-stil sade.
-- `src/components/landing/ModelSection.tsx` — kart layout'u: solda yuvarlak renkli icon badge, sağda title+desc, ince border. Renkler: amber, sky, violet, warm-orange.
-- `src/components/landing/StageMapSection.tsx` — 6 renkli kart (her kart farklı pastel zemin: amber/sky/violet/emerald/orange/sky), üstte numara rozeti, ortada başlık+kısa metin, altta büyük tek icon. Mobilde tek kolon, lg'de 6 kolon.
-- `src/components/landing/AudienceSection.tsx` — **4 karta indir** (kullanıcı yeni listeyi verdi), 2 kolonlu grid; her kartta sol icon, başlık+desc, sağda chevron oku. Kısa intro: "İyiliği artıran, ilme ve topluma fayda sunan projeler için tasarlandı."
-- `src/components/landing/TwelveWeekFlowSection.tsx` — 8 kart yatay grid (lg:grid-cols-8, md:grid-cols-4, sm:grid-cols-2). Her kart: numara üstte, başlık ortada, ikon altta; pastel zemin; aralarda küçük chevron sağ ok (lg ve üzeri).
-- `src/components/landing/FinalCtaSection.tsx` — koyu slate-deep zemin, ortada mandala radial glow, sol blokta headline + 6 maddeli check listesi (3'lü 2 grid), sağda amber CTA + alt sekonder login linki. Köşelerde subtle amber/sky/violet glow.
-- `src/components/landing/Footer.tsx` — 3 sütun: sol kalp+tagline, orta globe+domain, sağ küçük amber simge+motto.
-- `src/components/landing/SectionHeading.tsx` — eyebrow opsiyonel kalsın, başlıkta italic accent kelime span desteği için `accentWord` prop eklenebilir (opsiyonel).
-- `src/i18n/locales/{tr,en}.json` — `landing.hero.chips.*`, `landing.hero.pills.*`, `landing.audience.intro`, `landing.audience.a1..a4` (yeni 4 maddeye revize), `landing.finalCta.checks.*` (6 madde) anahtarları.
+- `src/index.css`
+  - Yeni utility'ler: `.bg-grain` (çok hafif noise), `.bg-grid-soft` (10% opacity grid texture), `.divider-fade` (section-to-section ivory→ivory-deep yumuşak geçiş), `.btn-focus-ring` (tutarlı focus halkası), `.shadow-soft-1/2/3` token'lı gölge merdiveni.
+  - `glass-card` rötuşu: çift katmanlı gölge + ince inner-highlight refinement.
+  - Body type rendering: `text-rendering: optimizeLegibility` + `font-feature-settings: "ss01","cv11"`.
 
-**Yeni:**
-- `src/components/landing/HeroPills.tsx` — Hero altındaki "12 haftalık akış / İhtiyaç eşleşmesi / Impact Day" pill kartları + 2 büyük metric kart bandı.
-- `src/components/landing/FlowConnector.tsx` (opsiyonel, küçük chevron SVG bridging arası).
+- `src/pages/Landing.tsx`
+  - Bölümler arası `<div className="divider-fade" aria-hidden />` SVG/gradient ayraç ile yumuşak geçiş; fazladan `py` çakışmasını engellemek için section padding'leri normalize.
 
-## Tasarım kuralları
+- `src/components/landing/SectionHeading.tsx`
+  - Eyebrow'a küçük amber nokta + ince çizgi ön-eki (system look).
+  - Title leading sıkılaştır (`leading-[1.08]`), tracking `-tracking-[0.01em]`, mobilde `text-[2rem]` taban.
+  - Subtitle max-width düşür (`max-w-2xl`) + `text-pretty`.
 
-- Tema: light (ivory) varsayılan; sadece Final CTA bloğu koyu slate-deep.
-- Renk semantik token: `accent-amber` (primary CTA), `accent-sky`, `accent-violet`, ek pastel softlar (`-soft` varyantları zaten var).
-- Tipografi: Playfair Display başlık (mevcut), gövde Open Sans.
-- Motion: `animate-fade-in` (zaten var) + Tailwind `transition` hover-lift; framer-motion **eklenmeyecek**.
-- Mobil: tüm grid'ler 1 kolon stack; flow yatayda mobil için snap-scroll yerine wrap (md:2 lg:8); audience 1 kolon (md:2).
-- Erişilebilirlik: `<header>/<section>/<footer>` semantik (zaten kullanılıyor), `aria-label` butonlarda, focus ring shadcn varsayılanı.
+- `src/components/landing/Hero.tsx`
+  - 12-kolon grid'i 7/5'e dengele, dikey alignment iyileştir; sol blokta üst boşluk + alt CTA arası ritim.
+  - Headline tipografisi: `text-[2.5rem] sm:text-5xl lg:text-[4.5rem] xl:text-[5rem] leading-[1.02] -tracking-[0.02em]`. Son kelime italic+amber `font-display` korunur, ince underline-glow eklenir.
+  - Chip'ler: yüksekliği 28px sabitle, ince ring + subtle inner shadow.
+  - Primary CTA: amber gradient (`from-accent-amber to-accent-amber/85`) + odak halkası; secondary: glass border + hover translate.
+  - Hero pill+metric şeridi mobilde 1 kolon, sm:2, lg:5 (zaten var) ama kart iç padding'lerini `p-5` çık, ikon/metin hizası grid `items-center`.
+  - Arka plan blob'larını biraz kıs ve `mix-blend-multiply` ile daha "kâğıt" his ver.
+
+- `src/components/landing/ProjectSignalCard.tsx`
+  - Üst başlık şeridi: sola küçük rocket+stage etiketi rozet, sağa "live" pulse + Activity ikon (status bar gibi).
+  - Stage dot bar'a hafif "milestone" label'ları (1..6 rakam tooltipsiz, küçük üst etiket).
+  - 3 satır kart'ları daha sıkı: solda renkli ikon kutusu (10x10), ortada label/value, sağda büyük yüzde + ince % bar.
+  - Kartın içine ince üst grid texture overlay (opacity 0.04) + 1px inner highlight; dış gradient halo'yu sönükleştir.
+  - Köşelere `rounded-[28px]` + `shadow-soft-3`.
+
+- `src/components/landing/ModelSection.tsx`
+  - Kartlar arası gap `gap-6`, kart `p-7 rounded-2xl`, üst icon kutusunu daire (`rounded-full`) yap (referansla uyumlu).
+  - Hover: `-translate-y-1` + amber border glow ring; aktif baseline border `border-border/60`.
+
+- `src/components/landing/StageMapSection.tsx`
+  - Tüm kartlar aynı yükseklik (`h-full grid grid-rows-[auto_auto_1fr_auto]`).
+  - Numara rozeti dışa çıkık (top-left `-mt-3`).
+  - Kart aralarına bağlayıcı ince çizgi (lg only, dashed border-dashed).
+  - Tutarlı opacity tonları (60%) + tek bir `rounded-2xl` shape.
+
+- `src/components/landing/AudienceSection.tsx`
+  - 4-kart layout 12-kolon split korunur; başlık tarafına küçük amber dash-divider eklenir (referansta var).
+  - Kart hover: chevron amber'a kayar (zaten var) + ince border ring genişler.
+  - Mobilde sol başlık üstte stack.
+
+- `src/components/landing/TwelveWeekFlowSection.tsx`
+  - Kartlara min-h ekle (`min-h-[10.5rem]`) ki başlıklar 1/2/3 satırda hizalansın.
+  - Numara tipografisi `font-mono text-xs tracking-[0.18em]`, ikon altında ince ayraç çizgisi.
+  - lg-altı (md): 4 kolon ama chevron'lar gizli; sm: 2 kolon; xs: yatay snap-scroll (`snap-x` overflow) tek satır okunabilirliği için.
+  - Bağlantı chevron'ları lg+ daha hafif (`text-border/60`).
+
+- `src/components/landing/FinalCtaSection.tsx`
+  - Slate kart `rounded-[2rem]` + `border-slate-deep/30`, padding `p-10 md:p-14 lg:p-16`.
+  - Mandala dot pattern opacity'sini düşür (0.05) + sol kenarda subtle SVG mandala silüeti (statik, dekoratif, ince çizgi, %10 opacity, asset değil inline SVG).
+  - CTA buton sol-sağ dengeli; checklist 2 sütun mobilde tek sütun.
+  - Login linki ayrı satıra alınır, ikon hizası tutarlı.
+
+- `src/components/landing/Footer.tsx`
+  - Üstte `divider-fade` ile yumuşak geçiş; padding `py-10`, fontlar daha ince, ortadaki domain'e küçük gold underline-glow.
+
+## Tipografi & ritim kuralları
+
+- Section vertical rhythm: `py-20 md:py-24 lg:py-28` standardı; ardışık iki ivory-deep yan yana gelmesin (Audience deep → Flow ivory → CTA ivory-deep zaten doğru).
+- Heading scale: H1 `text-[2.5rem]→5rem`, H2 `text-[1.875rem]→3rem`, eyebrow `text-[11px]`.
+- Body `text-[15px] leading-[1.65]` muted.
+- Tüm CTA: `h-11 px-6 rounded-xl font-medium` + `focus-visible:ring-2 ring-accent-amber/60 ring-offset-2 ring-offset-ivory`.
+
+## Mobil iyileştirmeleri
+
+- Hero: tek kolon stack, headline `text-4xl`, Project Signal kart hero altına; pill şeridi `grid-cols-1 sm:grid-cols-2`.
+- Stage map: `sm:grid-cols-2 lg:grid-cols-6` (zaten var) + her kart yüksekliği eşit.
+- 12-week: `xs:flex snap-x` opsiyon (tek satır kaydırılır), default `sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8`.
+- Final CTA mobil: padding `p-6`, başlık 24px, checklist tek sütun.
+- Footer: 3 sütun → mobilde stack center.
 
 ## Dokunulmayacak
 
-- `src/components/Navbar.tsx`, `App.tsx` route'ları, auth, supabase, edge functions, migrations, diğer sayfalar.
-- Eski landing key'leri (`landing.howItWorks` vb.) silinmeyecek.
-- Karanlık varsayılan tema **kurulmayacak**; mevcut tema toggle korunacak.
+- Routes, App.tsx, Navbar (global), auth, Supabase client, edge functions, migrations.
+- i18n key'leri (yalnız stil/sınıf düzenlemesi).
+- Mevcut tema toggle ve dark variant (varsayılan light kalır).
+- Hiçbir asset import edilmeyecek (mandala dekorları inline SVG).
 
 ## Riskler
 
-- i18n: 4 → eski 6 audience mapping (kullanılmayan a5/a6 anahtarları korunup landing'de gösterilmeyecek — geriye dönük uyum).
-- Yatay 8'li flow lg ekran altında sıkışabilir → md:grid-cols-4 + sm:grid-cols-2 fallback ile çözülür; chevron'lar sadece lg+ görünür.
-- Mandala glow yalnızca CSS radial gradient ile yapılacak (resim asset eklenmeyecek).
+- `min-h` zorlamaları çok uzun çevirilerde kart taşması yapabilir → `line-clamp` yerine doğal akış bırakılır.
+- `mix-blend-multiply` Safari'de hafif farklı render → opacity fallback ile yumuşatılır.
+- Yeni utility'ler (`bg-grid-soft`, `divider-fade`) sadece landing'de kullanılıyor; global scope etkilemez.
 
-## Checklist (bu görevde karşılanacaklar)
+## Doğrulama
 
-- [x] Header: mevcut Navbar korunur (kapsam dışı, kullanıcı kuralı)
-- [x] Hero: chip + headline + amber CTA + secondary
-- [x] Project Signal kart (dot stage + satır yüzdeleri)
-- [x] Model section (4 kart)
-- [x] Stage map (6 renkli kart + icon)
-- [x] Audience (4 kart, oklu)
-- [x] 12 haftalık akış (8 kart yatay)
-- [x] Final CTA (koyu slate, mandala glow, 6 check)
-- [x] Footer (3 sütun)
-- [x] Responsive (sm/md/lg breakpoint testi)
-- [x] Auth/backend/db dokunulmadı
-- [x] Karanlık varsayılan yok
-- [x] Sahte logo/testimonial/pricing yok
+Otomatik harness build sonrası, hata varsa düzeltilir. Görsel inceleme için preview screenshot alınabilir (gerekirse).
 
-## Build doğrulaması
+## Checklist
 
-Uygulama tamamlandıktan sonra harness otomatik build çalıştırır; hata olursa düzeltilir.
+- [x] Spacing ritmi normalize
+- [x] Tipografi hiyerarşisi sıkılaştırıldı
+- [x] Hero headline daha güçlü
+- [x] Project Signal product-like
+- [x] Premium kart gölge/border/hover
+- [x] Bölüm geçişleri yumuşak
+- [x] Final CTA otoriter, gaudy değil
+- [x] Mobil sıkışıklık giderildi
+- [x] CTA tutarlı + focus ring
+- [x] Yapı/kopya değişmedi
+- [x] Auth/backend/db değişmedi

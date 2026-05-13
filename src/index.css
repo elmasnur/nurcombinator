@@ -158,10 +158,13 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3 {
     font-family: 'Playfair Display', serif;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -214,4 +217,27 @@
   .ring-soft-amber {
     box-shadow: 0 0 0 1px hsl(var(--accent-amber) / 0.25), 0 12px 30px -12px hsl(var(--accent-amber) / 0.4);
   }
+
+  .shadow-soft-1 { box-shadow: 0 1px 2px hsl(var(--slate-deep) / 0.04), 0 4px 12px -6px hsl(var(--slate-deep) / 0.08); }
+  .shadow-soft-2 { box-shadow: 0 1px 2px hsl(var(--slate-deep) / 0.05), 0 12px 28px -14px hsl(var(--slate-deep) / 0.18); }
+  .shadow-soft-3 { box-shadow: 0 2px 4px hsl(var(--slate-deep) / 0.04), 0 28px 60px -24px hsl(var(--slate-deep) / 0.22), 0 0 0 1px hsl(var(--border) / 0.6); }
+
+  .bg-grid-soft {
+    background-image:
+      linear-gradient(to right, hsl(var(--slate-deep) / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--slate-deep) / 0.05) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
+
+  .divider-fade {
+    height: 1px;
+    background: linear-gradient(to right, transparent, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent);
+  }
+
+  .focus-ring-amber {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-amber/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ivory;
+  }
+
+  .text-pretty { text-wrap: pretty; }
+  .text-balance { text-wrap: balance; }
 }
