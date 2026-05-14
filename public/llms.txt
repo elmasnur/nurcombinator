@@ -1,0 +1,18 @@
+# Nur Combinator
+
+> Risale-i Nur, ilim, eğitim, etik ve açık kaynak fayda üreten projelerin evresini tespit eden, ihtiyaçlarını netleştirip doğru mentor, ekip ve kaynaklarla buluşturan bağ dokusu platformu.
+
+Nur Combinator klasik bir hızlandırıcı değildir. Projelerin olgunlaşma çizgisini gözeten, 12 haftalık rehberli bir akış, açık ihtiyaç ilanları ve emanet (güven) filtresi sunar.
+
+## Pages
+
+- [Ana Sayfa (TR)](/tr): Platformun tanıtımı, model, evreler, 12 haftalık akış.
+- [Home (EN)](/en): Platform overview, model, stages, 12-week flow.
+- [Projeleri Keşfet (TR)](/tr/explore): Açık projeler ve ihtiyaç ilanları dizini.
+- [Explore (EN)](/en/explore): Directory of public projects and open calls.
+- [Proje Oluştur (TR)](/tr/projects/new): Yeni proje başlatma.
+- [Giriş / Kayıt (TR)](/tr/auth): Hesap oluşturma ve giriş.
+
+## Optional
+
+- [Mentor & Topluluk](/tr/explore): Mentor havuzu ve açık çağrılar.
