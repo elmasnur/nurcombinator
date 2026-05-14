@@ -31,6 +31,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navbar />
+          <main id="main">
           <Routes>
             {/* Bare paths → detect language and redirect */}
             <Route path="/" element={<LanguageRedirect />} />
@@ -64,6 +65,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </main>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
