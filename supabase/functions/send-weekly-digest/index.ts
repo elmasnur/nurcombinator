@@ -11,6 +11,20 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  // Require shared secret (service role key) to prevent public abuse.
+  const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const authHeader = req.headers.get('authorization') || ''
+  const cronSecret = req.headers.get('x-cron-secret') || ''
+  const providedBearer = authHeader.toLowerCase().startsWith('bearer ')
+    ? authHeader.slice(7).trim()
+    : ''
+  if (providedBearer !== SERVICE_ROLE && cronSecret !== SERVICE_ROLE) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
   if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured')
 
@@ -18,8 +32,7 @@ Deno.serve(async (req) => {
   if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured')
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE)
 
   try {
     // Get new projects from last 7 days
@@ -69,12 +82,20 @@ Deno.serve(async (req) => {
       const isTr = pref.language === 'tr'
       const subject = isTr ? 'Nur Combinator - Haftalık Özet' : 'Nur Combinator - Weekly Digest'
       
+      const esc = (s: string) =>
+        String(s ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+
       const projectsHtml = (newProjects || []).map(p =>
-        `<li><strong>${p.title}</strong> — ${p.summary || ''}</li>`
+        `<li><strong>${esc(p.title)}</strong> — ${esc(p.summary || '')}</li>`
       ).join('')
 
       const callsHtml = (openCalls || []).map(c =>
-        `<li><strong>${c.title}</strong> (${c.call_type}, ${c.location_mode})</li>`
+        `<li><strong>${esc(c.title)}</strong> (${esc(c.call_type)}, ${esc(c.location_mode)})</li>`
       ).join('')
 
       const html = `
