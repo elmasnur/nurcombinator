@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Heart, Globe, Sparkles } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -10,8 +11,8 @@ export default function Footer() {
           <span />
         </div>
         <div className="grid gap-6 py-10 text-sm md:grid-cols-3 md:items-center">
-          <div className="flex items-center gap-2 text-muted-foreground md:justify-start">
-            <Heart className="h-4 w-4 text-accent-amber" />
+          <div className="flex items-center gap-3 text-muted-foreground md:justify-start">
+            <BrandLogo variant="icon" className="h-6 shrink-0" />
             <span className="font-medium text-slate-deep/80">{t('landing.footerNote')}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground md:justify-center">
