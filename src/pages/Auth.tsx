@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { getUserFriendlyError } from '@/lib/error-utils';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -42,7 +43,8 @@ export default function Auth() {
         },
       });
       if (error) {
-        toast.error(t('auth.registerFailed') + ': ' + error.message);
+        console.error('Signup error:', error);
+        toast.error(t('auth.registerFailed') + ': ' + getUserFriendlyError(error));
       } else {
         toast.success(t('auth.registerSuccess'));
       }
