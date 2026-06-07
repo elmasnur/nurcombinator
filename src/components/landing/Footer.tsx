@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Heart, Globe, Sparkles } from 'lucide-react';
+import { Globe, Sparkles } from 'lucide-react';
 import BrandLogo from '@/components/BrandLogo';
 
 export default function Footer() {
